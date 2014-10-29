@@ -1,0 +1,115 @@
+-------------------------------------------------------------------------------
+
+PhoenixLAB Packaged Asset Container (PPAC)
+File Specification
+Version     4.0
+Author(s)   Vincent Zhang
+Created     September 23 2014
+Modified    September 24 2014
+
+-------------------------------------------------------------------------------
+
+A PPAC file is an organized, managed collection of packed, optionally
+compressed assets. Each asset file is assigned a unique identifieer composed
+of an integral type identifier, indicating the type of a file (equivalent to a
+file extension in a normal filesystem), an integral purpose identifier,
+indicating what module or subsystem the asset belongs to, and an integral
+unique identifier. Collectively this triplet is referred to as a TPU.
+Within a PPAC each TPU is unique, however between PPACs this need not be
+true - in fact, a PPAC loader/asset mangement system can take advantage of
+this to allow for overwriting of assets based on PPAC load order.
+
+A PPAC file consists of a header section, a file index, a PPAC metadata
+section, asset data sections, and optionally trash sections. Of these
+sections, only the header has a fixed position and size. The other sections
+are referenced, either directly or indirectly, by the header.
+
+PPAC files are big endian, excluding that of the asset files themselves, which
+may be in either endianness.
+
+PPAC files can use either 32 or 64 bit integer values to represent file size
+and position. This behavior can be set using the FLAG_WIDE_SIZE,
+FLAG_WIDE_POSITION. See appendix for flag information.
+
+A note about signed integers:
+Some languages or libraries utilize only signed integral types for addressing
+and seeking within a file or byte array. As such,
+
+Java's integral types are signed, and there is limited support for unsigned
+operations or values. Continuous arrays can be no longer than 2^31-1 elements,
+and many IO methods take sint32 values (again, capped at 2^31-1). This means
+Java implementations using those facilities cannot process assets or offsets
+greater than 2^31-1 bytes, or 2 GB. Some of the newer IO classes and methods
+use long sint64 values, which allows for a max of 2^63-1 bytes, or 9 exabytes.
+
+
+-------------------------------------------------------------------------------
+
+WIDE size means that the value is 8 bytes if the WIDE flag is set in the
+header, and 4 bytes if not.
+
+HEADER [40 BYTES (narrow) | 58 BYTES (wide)]
+
+Size        Type        Description
+4 BYTES     literal     Magic number 0x50504143 'PPAC'
+2 BYTES     short       Major version number (4)
+2 BYTES     short       Minor version number (0)
+8 BYTES     timestamp   File created timestamp (System.currentTimeMillis())
+8 BYTES     timestamp   File last modified timestamp
+4 BYTES     integer     Flags (see below)
+WIDE        integer     Index section offset
+WIDE        integer     Metadata section offset
+WIDE        integer     Trash section offset
+
+INDEX [4 BYTES + sizeof(IndexEntry)]
+
+4 BYTES     integer     Number of index entries
+n * sizeof(IndexEntry)  Entries
+
+INDEX ENTRY [28 BYTES (narrow) | 40 BYTES (wide)]
+2 BYTES     integer     Type ID
+2 BYTES     integer     Purpose ID
+4 BYTES     integer     Unique ID
+WIDE        integer     Asset size - on disk, including headers & metadata
+WIDE        integer     Asset location
+4 BYTES     integer     Compression ID
+4 BYTES     integer     Adler32 of file data (on disk)
+
+METADATA [4 BYTES + (4 BYTES (narrow) | 8 BYTES (wide)) + Metadata section size]
+WIDE        integer     Size of metadata section (including size field)
+4 BYTES     integer     Number of metadata entries
+SUMMATION(MetadataEntries)
+
+METADATA ENTRY [2 BYTES + sizeof(key) + sizeof(value)]
+1 BYTE      integer     Length of key String (bytes)
+1 BYTE      integer     Length of value String (bytes)
+k BYTES     string      Key
+v BYTES     string      Value
+
+TRASH INDEX [4 BYTES + sizeof(TrashEntry)]
+4 BYTES     integer     Number of trash entries
+n * sizeof(TrashEntry)  Entries
+
+TRASH ENTRY [8 BYTES (narrow) | 16 BYTES (wide)]
+WIDE        integer     Trash start location
+WIDE        integer     Trash length
+
+DATA ENTRY
+8 BYTES     timestamp   File created timestamp (System.currentTimeMillis())
+8 BYTES     timestamp   File last modified timestamp
+WIDE        integer     Asset data size
+n BYTES     data        Asset data
+3 BYTES     integer     Size of metadata section (including size field)
+1 BYTE      integer     Number of metadata entries
+m BYTES                 MetadataEntries
+
+
+FLAGS
+FLAG_WIDE_SIZE      0x00000001  Size fields are 64 bit (default 32)
+FLAG_WIDE_POSITION  0x00000002  Position/offset fields are 64 bit (default 32)
+FLAG_GIGA           0x00000004  Values exceed the max value of a sint32
+                                Any implementation that cannot address or
+                                allocate more than 2^31-1 bytes (2 GB) must
+                                reject this collection and produce an error.
+                                Any collection that has values greater than
+                                2^31-1 (2 GB) must have this flag set.
