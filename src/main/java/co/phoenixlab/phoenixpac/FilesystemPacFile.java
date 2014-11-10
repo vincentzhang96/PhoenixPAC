@@ -21,29 +21,27 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  * SOFTWARE.
  */
+
 package co.phoenixlab.phoenixpac;
 
-import java.util.LinkedHashMap;
+import java.io.FileNotFoundException;
+import java.io.IOException;
+import java.io.RandomAccessFile;
 
-public class Index {
+public class FilesystemPacFile extends PacFile {
 
-    protected int numIndexEntries;
-    protected final LinkedHashMap<TypePurposeUniqueId, IndexEntry> entries;
+    private RandomAccessFile randomAccessFile;
 
-    public Index(int numIndexEntries) {
-        this.numIndexEntries = numIndexEntries;
-        entries = new LinkedHashMap<>(numIndexEntries);
+    protected FilesystemPacFile(RandomAccessFile randomAccessFile) {
+        this.randomAccessFile = randomAccessFile;
     }
 
-    public Index() {
-        this(0);
-    }
-
-    public int getNumIndexEntries() {
-        return numIndexEntries;
-    }
-
-    public LinkedHashMap<TypePurposeUniqueId, IndexEntry> getEntries() {
-        return entries;
+    @Override
+    public AssetHandle getHandle(TypePurposeUniqueId tpuid) throws IOException {
+        IndexEntry entry = index.getEntries().get(tpuid);
+        if (entry == null) {
+            throw new FileNotFoundException(tpuid.toString());
+        }
+        return new OnDiskAssetHandle(entry, randomAccessFile);
     }
 }

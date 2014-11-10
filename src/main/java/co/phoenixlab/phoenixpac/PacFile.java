@@ -23,10 +23,31 @@
  */
 package co.phoenixlab.phoenixpac;
 
-public class PacFile {
+import java.io.IOException;
+
+public abstract class PacFile {
 
     protected PacHeader header;
     protected Index index;
+    protected PacMetadata metadata;
+    protected TrashIndex trashIndex;
 
+    public PacHeader getHeader() {
+        return header;
+    }
+
+    public Index getIndex() {
+        return index;
+    }
+
+    public PacMetadata getMetadata() {
+        return metadata;
+    }
+
+    public TrashIndex getTrashIndex() {
+        return trashIndex;
+    }
+
+    public abstract AssetHandle getHandle(TypePurposeUniqueId tpuid) throws IOException;
 
 }

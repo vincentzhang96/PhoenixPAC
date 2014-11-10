@@ -2,16 +2,14 @@ package co.phoenixlab.phoenixpac;
 
 public class PacHeader {
 
-    public static final int FLAG_WIDE_SIZE = 1,
-            FLAG_WIDE_POSITION = 2,
-            FLAG_GIGA = 4;
+    public static final int FLAG_USE_LONG_OFFSETS = 1;
 
     public static final int MAGIC_NUMBER = 0x50504143;
 
     protected int majorVersion;
     protected int minorVersion;
-    protected long fileCreatedTimestamp;
-    protected long fileModifiedTimestamp;
+    protected long reservedA;
+    protected long reservedB;
     protected int flags;
     protected long indexSectionOffset;
     protected long metadataSectionOffset;
@@ -25,12 +23,12 @@ public class PacHeader {
         return minorVersion;
     }
 
-    public long getFileCreatedTimestamp() {
-        return fileCreatedTimestamp;
+    public long getReservedA() {
+        return reservedA;
     }
 
-    public long getFileModifiedTimestamp() {
-        return fileModifiedTimestamp;
+    public long getReservedB() {
+        return reservedB;
     }
 
     public int getFlags() {
@@ -49,16 +47,8 @@ public class PacHeader {
         return trashSectionOffset;
     }
 
-    public boolean getWideSizeFlag() {
-        return (flags & FLAG_WIDE_SIZE) != 0;
-    }
-
-    public boolean getWidePositionFlag() {
-        return (flags & FLAG_WIDE_POSITION) != 0;
-    }
-
-    public boolean getGigaFlag() {
-        return (flags & FLAG_GIGA) != 0;
+    public boolean getFlag(int flagConst) {
+        return (flags & flagConst) != 0;
     }
 
 

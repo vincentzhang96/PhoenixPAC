@@ -23,20 +23,14 @@
  */
 package co.phoenixlab.phoenixpac;
 
-import java.nio.charset.StandardCharsets;
-
 public class MetadataEntry {
 
-    protected final int keyLength;
-    protected final int valLength;
-    protected final String key;
-    protected final String val;
+    protected int keyLength;
+    protected int valLength;
+    protected String key;
+    protected String val;
 
-    public MetadataEntry(String key, String val) {
-        this.key = key == null ? "" : val;
-        this.val = val == null ? "" : val;
-        keyLength = computeLength(this.key);
-        valLength = computeLength(this.val);
+    public MetadataEntry() {
     }
 
     public int getKeyLength() {
@@ -53,10 +47,6 @@ public class MetadataEntry {
 
     public String getVal() {
         return val;
-    }
-
-    protected int computeLength(String s) {
-        return s.getBytes(StandardCharsets.UTF_8).length;
     }
 
     @Override

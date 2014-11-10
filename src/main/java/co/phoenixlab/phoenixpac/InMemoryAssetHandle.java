@@ -21,29 +21,46 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  * SOFTWARE.
  */
+
 package co.phoenixlab.phoenixpac;
 
-import java.util.LinkedHashMap;
+import java.io.ByteArrayInputStream;
+import java.io.IOException;
+import java.io.InputStream;
+import java.nio.ByteBuffer;
 
-public class Index {
+public class InMemoryAssetHandle implements AssetHandle {
 
-    protected int numIndexEntries;
-    protected final LinkedHashMap<TypePurposeUniqueId, IndexEntry> entries;
+    private byte[] data;
 
-    public Index(int numIndexEntries) {
-        this.numIndexEntries = numIndexEntries;
-        entries = new LinkedHashMap<>(numIndexEntries);
-    }
-
-    public Index() {
+    public InMemoryAssetHandle() {
         this(0);
     }
 
-    public int getNumIndexEntries() {
-        return numIndexEntries;
+    public InMemoryAssetHandle(int size) {
+        data = new byte[size];
     }
 
-    public LinkedHashMap<TypePurposeUniqueId, IndexEntry> getEntries() {
-        return entries;
+    public InMemoryAssetHandle(byte[] data) {
+        this.data = data;
+    }
+
+    public void setRawBytes(byte[] data) {
+        this.data = data;
+    }
+
+    @Override
+    public byte[] getRawBytes() throws IOException {
+        return data;
+    }
+
+    @Override
+    public ByteBuffer getRawByteBuffer() throws IOException {
+        return ByteBuffer.wrap(data);
+    }
+
+    @Override
+    public InputStream getRawStream() throws IOException {
+        return new ByteArrayInputStream(data);
     }
 }

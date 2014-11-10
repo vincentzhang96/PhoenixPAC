@@ -21,29 +21,35 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  * SOFTWARE.
  */
+
 package co.phoenixlab.phoenixpac;
 
 import java.util.LinkedHashMap;
 
-public class Index {
+public class MetadataBlock {
 
-    protected int numIndexEntries;
-    protected final LinkedHashMap<TypePurposeUniqueId, IndexEntry> entries;
+    protected TypePurposeUniqueId tpuid;
+    protected int numberOfEntries;
+    protected int size;
+    protected final LinkedHashMap<String, MetadataEntry> entries;
 
-    public Index(int numIndexEntries) {
-        this.numIndexEntries = numIndexEntries;
-        entries = new LinkedHashMap<>(numIndexEntries);
+    public MetadataBlock() {
+        entries = new LinkedHashMap<>();
     }
 
-    public Index() {
-        this(0);
+    public TypePurposeUniqueId getTpuid() {
+        return tpuid;
     }
 
-    public int getNumIndexEntries() {
-        return numIndexEntries;
+    public int getNumberOfEntries() {
+        return numberOfEntries;
     }
 
-    public LinkedHashMap<TypePurposeUniqueId, IndexEntry> getEntries() {
+    public int getSize() {
+        return size;
+    }
+
+    public LinkedHashMap<String, MetadataEntry> getEntries() {
         return entries;
     }
 }

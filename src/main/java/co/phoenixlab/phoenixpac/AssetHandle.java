@@ -21,29 +21,19 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  * SOFTWARE.
  */
+
 package co.phoenixlab.phoenixpac;
 
-import java.util.LinkedHashMap;
+import java.io.IOException;
+import java.io.InputStream;
+import java.nio.ByteBuffer;
 
-public class Index {
+public interface AssetHandle {
 
-    protected int numIndexEntries;
-    protected final LinkedHashMap<TypePurposeUniqueId, IndexEntry> entries;
+    byte[] getRawBytes() throws IOException;
 
-    public Index(int numIndexEntries) {
-        this.numIndexEntries = numIndexEntries;
-        entries = new LinkedHashMap<>(numIndexEntries);
-    }
+    ByteBuffer getRawByteBuffer() throws IOException;
 
-    public Index() {
-        this(0);
-    }
+    InputStream getRawStream() throws IOException;
 
-    public int getNumIndexEntries() {
-        return numIndexEntries;
-    }
-
-    public LinkedHashMap<TypePurposeUniqueId, IndexEntry> getEntries() {
-        return entries;
-    }
 }

@@ -22,48 +22,24 @@
  * SOFTWARE.
  */
 
-package co.phoenixlab.phoenixpac;
+package co.phoenixlab.phoenixpac.throwables;
 
 import java.io.IOException;
-import java.io.InputStream;
-import java.nio.ByteBuffer;
 
-public abstract class DataEntry {
+public class InvalidPacFormatException extends IOException {
 
-    protected final long creationTimestamp;
-    protected final long lastModifiedTimestamp;
-    protected long dataSize;
-    protected final MetadataList metadataList;
-
-    public DataEntry(long creationTimestamp, long lastModifiedTimestamp) {
-        this.creationTimestamp = creationTimestamp;
-        this.lastModifiedTimestamp = lastModifiedTimestamp;
-        metadataList = new MetadataList();
+    public InvalidPacFormatException() {
     }
 
-    public long getCreationTimestamp() {
-        return creationTimestamp;
+    public InvalidPacFormatException(String message) {
+        super(message);
     }
 
-    public long getLastModifiedTimestamp() {
-        return lastModifiedTimestamp;
+    public InvalidPacFormatException(String message, Throwable cause) {
+        super(message, cause);
     }
 
-    public long getDataSize() {
-        return dataSize;
+    public InvalidPacFormatException(Throwable cause) {
+        super(cause);
     }
-
-    public MetadataList getMetadataList() {
-        return metadataList;
-    }
-
-    public abstract ByteBuffer getDataAsBuffer() throws IOException;
-
-    public abstract byte[] getDataAsBytes() throws IOException;
-
-    public abstract InputStream getDataAsStream() throws IOException;
-
-    public abstract void setDataFromBuffer(ByteBuffer buffer);
-
-    public abstract void setData(byte[] data);
 }

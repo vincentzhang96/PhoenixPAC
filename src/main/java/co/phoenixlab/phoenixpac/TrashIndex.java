@@ -21,29 +21,30 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  * SOFTWARE.
  */
+
 package co.phoenixlab.phoenixpac;
 
-import java.util.LinkedHashMap;
+import java.util.LinkedHashSet;
 
-public class Index {
+public class TrashIndex {
 
-    protected int numIndexEntries;
-    protected final LinkedHashMap<TypePurposeUniqueId, IndexEntry> entries;
+    protected int numTrashEntries;
+    protected final LinkedHashSet<TrashIndexEntry> entries;
 
-    public Index(int numIndexEntries) {
-        this.numIndexEntries = numIndexEntries;
-        entries = new LinkedHashMap<>(numIndexEntries);
+    public TrashIndex(int numTrashEntries) {
+        this.numTrashEntries = numTrashEntries;
+        entries = new LinkedHashSet<>(numTrashEntries);
     }
 
-    public Index() {
+    public TrashIndex() {
         this(0);
     }
 
-    public int getNumIndexEntries() {
-        return numIndexEntries;
+    public int getNumTrashEntries() {
+        return numTrashEntries;
     }
 
-    public LinkedHashMap<TypePurposeUniqueId, IndexEntry> getEntries() {
+    public LinkedHashSet<TrashIndexEntry> getEntries() {
         return entries;
     }
 }

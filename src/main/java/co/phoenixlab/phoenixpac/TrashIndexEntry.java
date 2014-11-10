@@ -21,29 +21,49 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  * SOFTWARE.
  */
+
 package co.phoenixlab.phoenixpac;
 
-import java.util.LinkedHashMap;
+public class TrashIndexEntry implements Comparable<TrashIndexEntry> {
 
-public class Index {
+    protected long offset;
+    protected int size;
 
-    protected int numIndexEntries;
-    protected final LinkedHashMap<TypePurposeUniqueId, IndexEntry> entries;
-
-    public Index(int numIndexEntries) {
-        this.numIndexEntries = numIndexEntries;
-        entries = new LinkedHashMap<>(numIndexEntries);
+    public TrashIndexEntry() {
     }
 
-    public Index() {
-        this(0);
+    public long getOffset() {
+        return offset;
     }
 
-    public int getNumIndexEntries() {
-        return numIndexEntries;
+    public int getSize() {
+        return size;
     }
 
-    public LinkedHashMap<TypePurposeUniqueId, IndexEntry> getEntries() {
-        return entries;
+    @Override
+    public int compareTo(TrashIndexEntry o) {
+        return Long.compareUnsigned(offset, o.offset);
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) {
+            return true;
+        }
+        if (o == null || getClass() != o.getClass()) {
+            return false;
+        }
+
+        TrashIndexEntry that = (TrashIndexEntry) o;
+
+        return offset == that.offset && size == that.size;
+
+    }
+
+    @Override
+    public int hashCode() {
+        int result = (int) (offset ^ (offset >>> 32));
+        result = 31 * result + size;
+        return result;
     }
 }

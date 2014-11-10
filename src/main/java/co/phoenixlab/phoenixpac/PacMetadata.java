@@ -24,28 +24,27 @@
 
 package co.phoenixlab.phoenixpac;
 
-import java.util.HashMap;
-import java.util.Map;
+import java.util.LinkedHashMap;
 
-public class MetadataList {
+public class PacMetadata {
 
-    protected long size;
-    protected int numMetadataEntries;
-    protected final Map<String, String> metadata;
+    protected int size;
+    protected int numMetadataBlocks;
+    protected final LinkedHashMap<TypePurposeUniqueId, MetadataBlock> metadata;
 
-    {
-        metadata = new HashMap<>();
+    public PacMetadata() {
+        metadata = new LinkedHashMap<>();
     }
 
-    public int getNumMetadataEntries() {
-        return numMetadataEntries;
+    public int getNumMetadataBlocks() {
+        return numMetadataBlocks;
     }
 
-    public long getSize() {
+    public int getSize() {
         return size;
     }
 
-    public Map<String, String> getMetadata() {
+    public LinkedHashMap<TypePurposeUniqueId, MetadataBlock> getMetadata() {
         return metadata;
     }
 }
