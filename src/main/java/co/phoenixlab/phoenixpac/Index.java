@@ -24,6 +24,7 @@
 package co.phoenixlab.phoenixpac;
 
 import java.util.LinkedHashMap;
+import java.util.Map;
 
 public class Index {
 
@@ -35,8 +36,18 @@ public class Index {
         entries = new LinkedHashMap<>(numIndexEntries);
     }
 
+
+
     public Index() {
         this(0);
+    }
+
+    public Index(Index other) {
+        this.numIndexEntries = other.numIndexEntries;
+        this.entries = new LinkedHashMap<>(other.entries.size());
+        for (Map.Entry<TypePurposeUniqueId, IndexEntry> entry : other.entries.entrySet()) {
+            entries.put(entry.getKey(), new IndexEntry(entry.getValue()));
+        }
     }
 
     public int getNumIndexEntries() {

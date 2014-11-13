@@ -15,6 +15,20 @@ public class PacHeader {
     protected long metadataSectionOffset;
     protected long trashSectionOffset;
 
+    public PacHeader() {
+    }
+
+    public PacHeader(PacHeader other) {
+        this.majorVersion = other.majorVersion;
+        this.minorVersion = other.minorVersion;
+        this.reservedA = other.reservedA;
+        this.reservedB = other.reservedB;
+        this.flags = other.flags;
+        this.indexSectionOffset = other.indexSectionOffset;
+        this.metadataSectionOffset = other.metadataSectionOffset;
+        this.trashSectionOffset = other.trashSectionOffset;
+    }
+
     public int getMajorVersion() {
         return majorVersion;
     }

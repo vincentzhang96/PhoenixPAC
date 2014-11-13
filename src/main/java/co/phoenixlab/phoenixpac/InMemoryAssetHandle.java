@@ -28,6 +28,7 @@ import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.nio.ByteBuffer;
+import java.util.Arrays;
 
 public class InMemoryAssetHandle implements AssetHandle {
 
@@ -45,6 +46,9 @@ public class InMemoryAssetHandle implements AssetHandle {
         this.data = data;
     }
 
+    public InMemoryAssetHandle(InMemoryAssetHandle other) {
+        this.data = Arrays.copyOf(other.data, other.data.length);
+    }
     public void setRawBytes(byte[] data) {
         this.data = data;
     }

@@ -33,6 +33,13 @@ public class MetadataEntry {
     public MetadataEntry() {
     }
 
+    public MetadataEntry(MetadataEntry other) {
+        this.keyLength = other.keyLength;
+        this.valLength = other.valLength;
+        this.key = other.key;
+        this.val = other.val;
+    }
+
     public int getKeyLength() {
         return keyLength;
     }

@@ -25,6 +25,7 @@
 package co.phoenixlab.phoenixpac;
 
 import java.util.LinkedHashMap;
+import java.util.Map;
 
 public class PacMetadata {
 
@@ -34,6 +35,15 @@ public class PacMetadata {
 
     public PacMetadata() {
         metadata = new LinkedHashMap<>();
+    }
+
+    public PacMetadata(PacMetadata other) {
+        this.size = other.size;
+        this.numMetadataBlocks = other.numMetadataBlocks;
+        this.metadata = new LinkedHashMap<>(other.metadata.size());
+        for (Map.Entry<TypePurposeUniqueId, MetadataBlock> entry : other.metadata.entrySet()) {
+            metadata.put(entry.getKey(), new MetadataBlock(entry.getValue()));
+        }
     }
 
     public int getNumMetadataBlocks() {

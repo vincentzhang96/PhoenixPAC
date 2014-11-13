@@ -25,6 +25,7 @@
 package co.phoenixlab.phoenixpac;
 
 import java.util.LinkedHashMap;
+import java.util.Map;
 
 public class MetadataBlock {
 
@@ -36,6 +37,17 @@ public class MetadataBlock {
     public MetadataBlock() {
         entries = new LinkedHashMap<>();
     }
+
+    public MetadataBlock(MetadataBlock other) {
+        this.tpuid = other.tpuid;
+        this.numberOfEntries = other.numberOfEntries;
+        this.size = other.size;
+        this.entries = new LinkedHashMap<>(other.entries.size());
+        for (Map.Entry<String, MetadataEntry> entry : other.entries.entrySet()) {
+            entries.put(entry.getKey(), new MetadataEntry(entry.getValue()));
+        }
+    }
+
 
     public TypePurposeUniqueId getTpuid() {
         return tpuid;

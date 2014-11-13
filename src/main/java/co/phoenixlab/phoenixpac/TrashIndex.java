@@ -25,6 +25,7 @@
 package co.phoenixlab.phoenixpac;
 
 import java.util.LinkedHashSet;
+import java.util.stream.Collectors;
 
 public class TrashIndex {
 
@@ -36,8 +37,18 @@ public class TrashIndex {
         entries = new LinkedHashSet<>(numTrashEntries);
     }
 
+
+
     public TrashIndex() {
         this(0);
+    }
+
+    public TrashIndex(TrashIndex other) {
+        this.numTrashEntries = other.numTrashEntries;
+        this.entries = new LinkedHashSet<>(other.entries.size());
+        entries.addAll(entries.stream().
+                map(TrashIndexEntry::new).
+                collect(Collectors.toList()));
     }
 
     public int getNumTrashEntries() {

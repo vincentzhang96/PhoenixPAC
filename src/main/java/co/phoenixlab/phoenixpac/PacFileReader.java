@@ -58,7 +58,7 @@ public class PacFileReader implements AutoCloseable {
     }
 
     private void readHeader(PacFile pacFile) throws IOException {
-        PacHeader header = new PacHeader();
+        final PacHeader header = new PacHeader();
         int magicNumber = randomAccessFile.readInt();
         if (magicNumber != PacHeader.MAGIC_NUMBER) {
             throw new InvalidPacFormatException(String.format("Bad magic: Expected %08X, got %08X",
@@ -90,11 +90,11 @@ public class PacFileReader implements AutoCloseable {
 
     private void readIndex(PacFile pacFile) throws IOException {
         randomAccessFile.seek(pacFile.header.indexSectionOffset);
-        int numEntries = randomAccessFile.readInt();
+        final int numEntries = randomAccessFile.readInt();
         if (numEntries < 0) {
             throw new InvalidPacFormatException("Cannot have a negative number of Index Entries");
         }
-        Index index = new Index(numEntries);
+        final Index index = new Index(numEntries);
         final boolean useLong = pacFile.header.getFlag(PacHeader.FLAG_USE_LONG_OFFSETS);
         for (int i = 0; i < numEntries; i++) {
             readIndexEntry(index, useLong);
@@ -102,8 +102,8 @@ public class PacFileReader implements AutoCloseable {
         pacFile.index = index;
     }
 
-    private void readIndexEntry(Index index, boolean useLong) throws IOException {
-        IndexEntry entry  = new IndexEntry();
+    private void readIndexEntry(final Index index, final boolean useLong) throws IOException {
+        final IndexEntry entry  = new IndexEntry();
         entry.tpuid = readTPUID();
         if (useLong) {
             entry.offset = randomAccessFile.readLong();
@@ -119,8 +119,8 @@ public class PacFileReader implements AutoCloseable {
         index.entries.put(entry.getTPUID(), entry);
     }
 
-    private void readMetadata(PacFile pacFile) throws IOException {
-        PacMetadata metadata = new PacMetadata();
+    private void readMetadata(final PacFile pacFile) throws IOException {
+        final PacMetadata metadata = new PacMetadata();
         if (pacFile.header.metadataSectionOffset != 0) {
             randomAccessFile.seek(pacFile.header.metadataSectionOffset);
             metadata.size = randomAccessFile.readInt();
@@ -133,7 +133,7 @@ public class PacFileReader implements AutoCloseable {
     }
 
     private void readMetadataBlock(PacMetadata metadata) throws IOException {
-        MetadataBlock block = new MetadataBlock();
+        final MetadataBlock block = new MetadataBlock();
         block.tpuid = readTPUID();
         block.numberOfEntries = randomAccessFile.readUnsignedShort();
         block.size = randomAccessFile.readUnsignedShort();

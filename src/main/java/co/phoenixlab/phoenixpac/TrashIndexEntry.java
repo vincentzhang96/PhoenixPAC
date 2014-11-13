@@ -32,6 +32,11 @@ public class TrashIndexEntry implements Comparable<TrashIndexEntry> {
     public TrashIndexEntry() {
     }
 
+    public TrashIndexEntry(TrashIndexEntry other) {
+        this.offset = other.offset;
+        this.size = other.size;
+    }
+
     public long getOffset() {
         return offset;
     }

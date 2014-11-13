@@ -32,6 +32,16 @@ public abstract class PacFile {
     protected PacMetadata metadata;
     protected TrashIndex trashIndex;
 
+    public PacFile() {
+    }
+
+    public PacFile(PacFile other) {
+        this.header = new PacHeader(other.header);
+        this.index = new Index(other.index);
+        this.metadata = new PacMetadata(other.metadata);
+        this.trashIndex = new TrashIndex(other.trashIndex);
+    }
+
     public PacHeader getHeader() {
         return header;
     }
