@@ -1,8 +1,12 @@
 package co.phoenixlab.phoenixpac;
 
+import java.security.MessageDigest;
+import java.security.NoSuchAlgorithmException;
 import java.util.Arrays;
 
 public class IndexEntry {
+
+    public static final int SHA_256_HASH_BYTE_LEN = 32;
 
     protected TypePurposeUniqueId tpuid;
     protected long offset;
@@ -10,6 +14,10 @@ public class IndexEntry {
     protected int memorySize;
     protected int compressionId;
     protected byte[] sha256Hash;
+
+    {
+        sha256Hash = new byte[SHA_256_HASH_BYTE_LEN];
+    }
 
     public IndexEntry() {
     }
@@ -46,5 +54,15 @@ public class IndexEntry {
 
     public byte[] getSha256Hash() {
         return sha256Hash;
+    }
+
+    public static byte[] computeSha256Hash(byte[] input) {
+        try {
+            MessageDigest digest = MessageDigest.getInstance("SHA-256");
+            digest.reset();
+            return digest.digest(input);
+        } catch (NoSuchAlgorithmException n) {
+            throw new RuntimeException("SHA-256 must be available on this system to use the digest feature.", n);
+        }
     }
 }
