@@ -31,15 +31,24 @@ import java.nio.ByteBuffer;
 import java.nio.channels.Channels;
 import java.nio.channels.FileChannel;
 
-public class OnDiskAssetHandle implements AssetHandle {
+public class FileSystemAssetHandle implements AssetHandle {
 
     private final IndexEntry indexEntry;
     private final RandomAccessFile file;
+    private final int compressionId;
 
-    public OnDiskAssetHandle(IndexEntry indexEntry, RandomAccessFile file) {
+    public FileSystemAssetHandle(IndexEntry indexEntry, RandomAccessFile file, int compressionId) {
         this.indexEntry = indexEntry;
         this.file = file;
+        this.compressionId = compressionId;
     }
+
+    public FileSystemAssetHandle(FileSystemAssetHandle other) {
+        this.indexEntry = new IndexEntry(other.indexEntry);
+        this.file = other.file;
+        this.compressionId = other.compressionId;
+    }
+
 
     @Override
     public byte[] getRawBytes() throws IOException {
@@ -65,17 +74,22 @@ public class OnDiskAssetHandle implements AssetHandle {
     public InputStream getRawStream() throws IOException {
         FileChannel channel = file.getChannel().position(indexEntry.offset);
         InputStream stream = Channels.newInputStream(channel);
-        return new OnDiskInputStream(stream, indexEntry.diskSize);
+        return new FileSystemInputStream(stream, indexEntry.diskSize);
+    }
+
+    @Override
+    public int getCompressionId() {
+        return compressionId;
     }
 }
 
-class OnDiskInputStream extends InputStream {
+class FileSystemInputStream extends InputStream {
 
     private final InputStream stream;
     private final int size;
     private int count;
 
-    public OnDiskInputStream(InputStream stream, int size) {
+    public FileSystemInputStream(InputStream stream, int size) {
         this.stream = stream;
         this.size = size;
         this.count = 0;

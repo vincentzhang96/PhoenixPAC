@@ -30,24 +30,26 @@ import java.io.InputStream;
 import java.nio.ByteBuffer;
 import java.util.Arrays;
 
-public class InMemoryAssetHandle implements AssetHandle {
+public class MemoryAssetHandle implements AssetHandle {
 
-    private byte[] data;
+    protected byte[] data;
+    protected int compressionId;
 
-    public InMemoryAssetHandle() {
+    public MemoryAssetHandle() {
         this(0);
     }
 
-    public InMemoryAssetHandle(int size) {
+    public MemoryAssetHandle(int size) {
         data = new byte[size];
     }
 
-    public InMemoryAssetHandle(byte[] data) {
+    public MemoryAssetHandle(byte[] data) {
         this.data = data;
     }
 
-    public InMemoryAssetHandle(InMemoryAssetHandle other) {
+    public MemoryAssetHandle(MemoryAssetHandle other) {
         this.data = Arrays.copyOf(other.data, other.data.length);
+        this.compressionId = other.compressionId;
     }
     public void setRawBytes(byte[] data) {
         this.data = data;
@@ -66,5 +68,10 @@ public class InMemoryAssetHandle implements AssetHandle {
     @Override
     public InputStream getRawStream() throws IOException {
         return new ByteArrayInputStream(data);
+    }
+
+    @Override
+    public int getCompressionId() {
+        return compressionId;
     }
 }

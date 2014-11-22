@@ -36,4 +36,6 @@ public interface AssetHandle {
 
     InputStream getRawStream() throws IOException;
 
+    int getCompressionId();
+
 }
