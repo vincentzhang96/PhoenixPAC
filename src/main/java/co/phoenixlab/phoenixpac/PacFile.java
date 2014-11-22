@@ -27,6 +27,10 @@ import java.io.IOException;
 
 public abstract class PacFile {
 
+
+    public static final int MAJOR_VERSION = 4;
+    public static final int MINOR_VERSION = 0;
+
     protected PacHeader header;
     protected Index index;
     protected PacMetadata metadata;
@@ -38,8 +42,25 @@ public abstract class PacFile {
     public PacFile(PacFile other) {
         this.header = new PacHeader(other.header);
         this.index = new Index(other.index);
-        this.metadata = new PacMetadata(other.metadata);
-        this.trashIndex = new TrashIndex(other.trashIndex);
+        if (other.metadata == null) {
+            this.metadata = new PacMetadata(other.metadata);
+        } else {
+            this.metadata = new PacMetadata();
+        }
+        if (other.trashIndex != null) {
+            this.trashIndex = new TrashIndex(other.trashIndex);
+        } else {
+            this.trashIndex = new TrashIndex();
+        }
+    }
+
+    public PacFile(int majorVers, int minorVers) {
+        this.header = new PacHeader();
+        this.header.majorVersion = majorVers;
+        this.header.minorVersion = minorVers;
+        this.index = new Index();
+        this.metadata = new PacMetadata();
+        this.trashIndex = new TrashIndex();
     }
 
     public PacHeader getHeader() {
