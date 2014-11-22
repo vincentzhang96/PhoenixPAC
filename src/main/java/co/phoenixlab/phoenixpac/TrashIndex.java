@@ -29,6 +29,8 @@ import java.util.stream.Collectors;
 
 public class TrashIndex {
 
+    public static int GUARD_BYTES = 0x54525348;
+
     protected int numTrashEntries;
     protected final LinkedHashSet<TrashIndexEntry> entries;
 
