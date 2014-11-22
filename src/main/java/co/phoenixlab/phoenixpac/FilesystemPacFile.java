@@ -42,6 +42,6 @@ public class FilesystemPacFile extends PacFile {
         if (entry == null) {
             throw new FileNotFoundException(tpuid.toString());
         }
-        return new OnDiskAssetHandle(entry, randomAccessFile);
+        return new FileSystemAssetHandle(entry, randomAccessFile, entry.compressionId);
     }
 }

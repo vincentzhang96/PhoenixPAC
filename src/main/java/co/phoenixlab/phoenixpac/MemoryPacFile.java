@@ -31,7 +31,7 @@ import java.util.Map;
 
 public class MemoryPacFile extends PacFile {
 
-    protected final LinkedHashMap<TypePurposeUniqueId, InMemoryAssetHandle> handles;
+    protected final LinkedHashMap<TypePurposeUniqueId, MemoryAssetHandle> handles;
 
     {
         handles = new LinkedHashMap<>();
@@ -44,14 +44,31 @@ public class MemoryPacFile extends PacFile {
         super(other);
     }
 
+    /**
+     * Performs a deep copy from another MPF
+     * @param other
+     */
     public MemoryPacFile(MemoryPacFile other) {
         super(other);
         handles.clear();
-        for (Map.Entry<TypePurposeUniqueId, InMemoryAssetHandle> entry : other.handles.entrySet()) {
-            handles.put(entry.getKey(), new InMemoryAssetHandle(entry.getValue()));
-        }
+        deepCopyHandles(other.handles);
     }
 
+    /**
+     * Performs a deep copy from a Map of handles
+     * @param handles
+     */
+    public MemoryPacFile(Map<TypePurposeUniqueId, MemoryAssetHandle> handles) {
+        super(PacFile.MAJOR_VERSION, PacFile.MINOR_VERSION);
+        this.handles.clear();
+        deepCopyHandles(handles);
+    }
+
+    private void deepCopyHandles(Map<TypePurposeUniqueId, MemoryAssetHandle> other) {
+        for (Map.Entry<TypePurposeUniqueId, MemoryAssetHandle> entry : other.entrySet()) {
+            handles.put(entry.getKey(), new MemoryAssetHandle(entry.getValue()));
+        }
+    }
 
     @Override
     public AssetHandle getHandle(TypePurposeUniqueId tpuid) throws IOException {
@@ -61,4 +78,5 @@ public class MemoryPacFile extends PacFile {
         }
         throw new FileNotFoundException(tpuid.toString());
     }
+
 }
