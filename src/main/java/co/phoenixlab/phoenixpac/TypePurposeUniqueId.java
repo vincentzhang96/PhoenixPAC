@@ -4,7 +4,7 @@ public class TypePurposeUniqueId implements Comparable<TypePurposeUniqueId> {
 
     public static final TypePurposeUniqueId ZERO_TPUID = new TypePurposeUniqueId(0, 0);
     public static final TypePurposeUniqueId T_TPUID = new TypePurposeUniqueId(0xFFFF0000, 0);
-    public static final TypePurposeUniqueId P_TPUID = new TypePurposeUniqueId(0xFFFF, 0);
+    public static final TypePurposeUniqueId P_TPUID = new TypePurposeUniqueId(0x0000FFFF, 0);
     public static final TypePurposeUniqueId U_TPUID = new TypePurposeUniqueId(0, 0xFFFFFFFF);
     public static final TypePurposeUniqueId TP_TPUID = new TypePurposeUniqueId(0xFFFFFFFF, 0);
 
@@ -18,6 +18,11 @@ public class TypePurposeUniqueId implements Comparable<TypePurposeUniqueId> {
     protected TypePurposeUniqueId(int typePurposeId, int uniqueId) {
         this.typePurposeId = typePurposeId;
         this.uniqueId = uniqueId;
+    }
+
+    public TypePurposeUniqueId(TypePurposeUniqueId other) {
+        this.typePurposeId = other.typePurposeId;
+        this.uniqueId = other.uniqueId;
     }
 
     public int getTypeId() {
@@ -57,7 +62,7 @@ public class TypePurposeUniqueId implements Comparable<TypePurposeUniqueId> {
 
     @Override
     public String toString() {
-        return String.format("TPUID[type=0x%08X purpose=0x%08X unique=0x%08X]", getTypeId(), getPurposeId(), getUniqueId());
+        return String.format("TPUID[type=0x%04X purpose=0x%04X unique=0x%08X]", getTypeId(), getPurposeId(), getUniqueId());
     }
 
     public TypePurposeUniqueId and(TypePurposeUniqueId other) {
