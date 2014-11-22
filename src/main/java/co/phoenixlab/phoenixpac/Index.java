@@ -28,6 +28,8 @@ import java.util.Map;
 
 public class Index {
 
+    public static final int GUARD_BYTES = 0x494E4458;
+
     protected int numIndexEntries;
     protected final LinkedHashMap<TypePurposeUniqueId, IndexEntry> entries;
 
@@ -56,5 +58,13 @@ public class Index {
 
     public LinkedHashMap<TypePurposeUniqueId, IndexEntry> getEntries() {
         return entries;
+    }
+
+    public IndexEntry getEntry(TypePurposeUniqueId tpuid) {
+        return entries.get(tpuid);
+    }
+
+    public void syncCount() {
+        numIndexEntries = entries.size();
     }
 }
