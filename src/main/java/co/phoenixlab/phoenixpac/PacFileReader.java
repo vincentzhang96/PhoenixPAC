@@ -67,10 +67,10 @@ public class PacFileReader implements AutoCloseable {
         }
         header.majorVersion = randomAccessFile.readUnsignedShort();
         header.minorVersion = randomAccessFile.readUnsignedShort();
-        if (header.majorVersion != 4) {
+        if (header.majorVersion != PacFile.MAJOR_VERSION) {
             throw new InvalidPacFormatException("Bad major version: Expected 4, got " + header.majorVersion);
         }
-        if (header.minorVersion != 0) {
+        if (header.minorVersion != PacFile.MINOR_VERSION) {
             throw new InvalidPacFormatException("Bad major version: Expected 0, got " + header.minorVersion);
         }
         header.reservedA = randomAccessFile.readLong();
@@ -99,6 +99,10 @@ public class PacFileReader implements AutoCloseable {
         for (int i = 0; i < numEntries; i++) {
             readIndexEntry(index, useLong);
         }
+        int guard = randomAccessFile.readInt();
+        if (guard != Index.GUARD_BYTES) {
+            throw new InvalidPacFormatException(String.format("Bad index guard bytes 0x%08X", guard));
+        }
         pacFile.index = index;
     }
 
@@ -112,8 +116,8 @@ public class PacFileReader implements AutoCloseable {
         }
         entry.diskSize = randomAccessFile.readInt();
         entry.memorySize = randomAccessFile.readInt();
-        entry.compressionId = randomAccessFile.readInt();
-        byte[] shaHash = new byte[16];
+        entry.compressionId = (randomAccessFile.readInt() & 0xFF000000) >> 24;
+        byte[] shaHash = new byte[IndexEntry.SHA_256_HASH_BYTE_LEN];
         randomAccessFile.readFully(shaHash);
         entry.sha256Hash = shaHash;
         index.entries.put(entry.getTPUID(), entry);
@@ -127,6 +131,10 @@ public class PacFileReader implements AutoCloseable {
             metadata.numMetadataBlocks = randomAccessFile.readInt();
             for (int i = 0; i < metadata.numMetadataBlocks; i++) {
                 readMetadataBlock(metadata);
+            }
+            int guard = randomAccessFile.readInt();
+            if (guard != PacMetadata.GUARD_BYTES) {
+                throw new InvalidPacFormatException(String.format("Bad index guard bytes 0x%08X", guard));
             }
         }
         pacFile.metadata = metadata;
@@ -164,6 +172,10 @@ public class PacFileReader implements AutoCloseable {
             index.numTrashEntries = randomAccessFile.readInt();
             for (int i = 0; i < index.numTrashEntries; i++) {
                 readTrashIndexEntry(index, useLong);
+            }
+            int guard = randomAccessFile.readInt();
+            if (guard != TrashIndex.GUARD_BYTES) {
+                throw new InvalidPacFormatException(String.format("Bad index guard bytes 0x%08X", guard));
             }
         }
         pacFile.trashIndex = index;
