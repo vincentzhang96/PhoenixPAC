@@ -77,6 +77,7 @@ Fields that indicate the size of the structure exclude themselves from that valu
 |------------|----------|-------------|
 | `4 BYTES ` | integer  | Number of Index Entries |
 |            | set      | Set of Index Entries |
+| `4 BYTES`  | int      | Guard bytes `0x494E4458` |
 
 ####Index Entry
 | Size       | Type     | Description |
@@ -87,7 +88,8 @@ Fields that indicate the size of the structure exclude themselves from that valu
 | `WIDE`     | integer  | Disk offset |
 | `4 BYTES`  | integer  | Disk size - max 2GB|
 | `4 BYTES`  | integer  | Memory (decompressed) size - max 2GB |
-| `4 BYTES`  | integer  | Compression type (0 is no compression) |
+| `1 BYTE`   | integer  | Compression type (0 is no compression) |
+| `3 BYTES`  | reserved | Reserved |
 | `32 BYTES` | hash     | SHA-256 hash of the file |
 
 ##Metadata Section
@@ -96,6 +98,7 @@ Fields that indicate the size of the structure exclude themselves from that valu
 | `4 BYTES`  | integer  | Size of Metadata Section |
 | `4 BYTES`  | integer  | Number of Metadata Blocks |
 |            | set      | Set of Metadata Blocks |
+| `4 BYTES`  | int      | Guard bytes `0x4D455441` |
 
 ####Metadata Block
 | Size       | Type     | Description |
@@ -106,6 +109,7 @@ Fields that indicate the size of the structure exclude themselves from that valu
 | `2 BYTES`  | integer  | Number of Metadata Entries |
 | `2 BYTES`  | integer  | Size of Metadata Entries |
 |            | set      | Set of Metadata Entries |
+| `4 BYTES`  | integer  | Guard bytes `0x11223344` |
 
 ####Metadata Entry
 | Size       | Type     | Description |
@@ -120,6 +124,7 @@ Fields that indicate the size of the structure exclude themselves from that valu
 |------------|----------|-------------|
 | `4 BYTES`  | integer  | Number of Trash Entries |
 |            | set      | Set of Trash Entries |
+| `4 BYTES`  | integer  | Guard bytes `0x54525348` |
 
 ####Trash Index Entry
 | Size       | Type     | Description |
