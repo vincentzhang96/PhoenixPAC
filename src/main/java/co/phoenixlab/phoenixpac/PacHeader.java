@@ -6,6 +6,8 @@ public class PacHeader {
 
     public static final int MAGIC_NUMBER = 0x50504143;
 
+    public static final int SIZE_OF = 4 + 4 + 8 + 8 + 4 + 8 + 8 + 8;
+
     protected int majorVersion;
     protected int minorVersion;
     protected long reservedA;
@@ -65,5 +67,10 @@ public class PacHeader {
         return (flags & flagConst) != 0;
     }
 
+    @Override
+    public String toString() {
+        return String.format("Header{maj=%s min=%s reserved=%016X %016X flags=%08X indxOff=%08X metaOff=%08X trshOff=%08X}",
+                             majorVersion, minorVersion, reservedA, reservedB, flags, indexSectionOffset, metadataSectionOffset, trashSectionOffset);
+    }
 
 }
