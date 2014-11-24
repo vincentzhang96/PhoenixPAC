@@ -1,5 +1,7 @@
 *.class
-*.iml
+PhoenixPAC.iml
+target
+*.pac
 
 # Mobile Tools for Java (J2ME)
 .mtj.tmp/
