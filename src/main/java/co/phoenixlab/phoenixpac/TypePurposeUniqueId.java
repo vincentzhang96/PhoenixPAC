@@ -85,12 +85,34 @@ public class TypePurposeUniqueId implements Comparable<TypePurposeUniqueId> {
         return new TypePurposeUniqueId(~(this.typePurposeId ^ other.typePurposeId), ~(this.uniqueId ^ other.uniqueId));
     }
 
+    /**
+     * Adds another TPUID component-wise to this one, returning a new TPUID with the result.
+     * Addition performed by this function <i>wraps around</i>, so 0xFFFF + 2 = 1 for T and P, extending to 4 bytes for U.
+     */
     public TypePurposeUniqueId add(TypePurposeUniqueId other) {
-        return new TypePurposeUniqueId(this.getTypeId() + other.getTypeId(), this.getPurposeId() + other.getPurposeId(), this.uniqueId + other.uniqueId);
+        return performAddition(other.getTypeId(), other.getPurposeId(), other.getUniqueId());
     }
 
+    /**
+     * Subtracts another TPUID component-wise from this one, returning a new TPUID with the result.
+     * Subtraction performed by this function <i>wraps around</i>, so 0 - 1 = 0xFFFF for T and P, extending to 4 bytes for U.
+     */
     public TypePurposeUniqueId subtract(TypePurposeUniqueId other) {
-        return new TypePurposeUniqueId(this.getTypeId() - other.getTypeId(), this.getPurposeId() - other.getPurposeId(), this.uniqueId - other.uniqueId);
+        //  To perform subtraction, perform wraparound by adding MAX + 1 - other
+        return performAddition(0x10000 - other.getTypeId(), 0x10000 - other.getPurposeId(), 0xFFFFFFFF - other.getUniqueId() + 1);
+    }
+
+    private TypePurposeUniqueId performAddition(int type, int purpose, int unique) {
+        //  This addition operation cannot overflow as type is always 0-0xFFFF.
+        int t = this.getTypeId() + type;
+        if (t > 0xFFFF) {
+            t = t - 0x10000;
+        }
+        int p = this.getPurposeId() + purpose;
+        if (p > 0xFFFF) {
+            p = p - 0x10000;
+        }
+        return new TypePurposeUniqueId(t, p, this.getUniqueId() + unique);
     }
 
     public boolean typeEquals(int typeId) {
