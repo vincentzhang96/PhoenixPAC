@@ -109,7 +109,6 @@ Fields that indicate the size of the structure exclude themselves from that valu
 | `2 BYTES`  | integer  | Number of Metadata Entries |
 | `2 BYTES`  | integer  | Size of Metadata Entries |
 |            | set      | Set of Metadata Entries |
-| `4 BYTES`  | integer  | Guard bytes `0x11223344` |
 
 ####Metadata Entry
 | Size       | Type     | Description |
