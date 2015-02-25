@@ -125,8 +125,8 @@ public class HandlePacBuilder {
             return this;
         }
 
-        public EntryBuilder withMemoryAssetHandle(MemoryAssetHandle memoryAssetHandle) {
-            assetHandle = memoryAssetHandle;
+        public EntryBuilder withAssetHandle(AssetHandle assetHandle) {
+            this.assetHandle = assetHandle;
             return this;
         }
 

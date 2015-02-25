@@ -57,7 +57,7 @@ public class ReadTest {
                 buildHeader().withLatestVersion().setFlag(PacHeader.FLAG_USE_LONG_OFFSETS, true).finishHeader().
                 newEntry().
                 withTPUID(typePurposeUniqueId).
-                withMemoryAssetHandle(assetHandle).
+                withAssetHandle(assetHandle).
                 withMemorySize(rawData.length).
                 withNoCompression().
                 withComputedSha256Hash().
