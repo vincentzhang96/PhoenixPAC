@@ -56,6 +56,11 @@ public class MemoryAssetHandle implements AssetHandle {
     }
 
     @Override
+    public AssetHandle copy() {
+        return new MemoryAssetHandle(this);
+    }
+
+    @Override
     public byte[] getRawBytes() throws IOException {
         return data;
     }

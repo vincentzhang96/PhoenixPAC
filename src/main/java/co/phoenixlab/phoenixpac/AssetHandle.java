@@ -38,4 +38,8 @@ public interface AssetHandle {
 
     int getCompressionId();
 
+    default AssetHandle copy() {
+        throw new UnsupportedOperationException("Copy not supported on " + getClass().toString());
+    }
+
 }

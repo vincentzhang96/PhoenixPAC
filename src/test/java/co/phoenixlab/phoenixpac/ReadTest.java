@@ -53,7 +53,7 @@ public class ReadTest {
         rawData = testString.getBytes(StandardCharsets.UTF_8);
         typePurposeUniqueId =new TypePurposeUniqueId(0xAABB, 0xCCDD, 0xDEADBEEF);
         MemoryAssetHandle assetHandle = new MemoryAssetHandle(rawData);
-        MemoryPacFile memoryPacFile = MemoryPacBuilder.newBuilder().
+        HandledPacFile memoryPacFile = HandlePacBuilder.newBuilder().
                 buildHeader().withLatestVersion().setFlag(PacHeader.FLAG_USE_LONG_OFFSETS, true).finishHeader().
                 newEntry().
                 withTPUID(typePurposeUniqueId).

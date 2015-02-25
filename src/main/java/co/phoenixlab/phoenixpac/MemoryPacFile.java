@@ -26,22 +26,10 @@ package co.phoenixlab.phoenixpac;
 
 import java.io.FileNotFoundException;
 import java.io.IOException;
-import java.util.LinkedHashMap;
-import java.util.Map;
 
-public class MemoryPacFile extends PacFile {
-
-    protected final LinkedHashMap<TypePurposeUniqueId, MemoryAssetHandle> handles;
-
-    {
-        handles = new LinkedHashMap<>();
-    }
+public class MemoryPacFile extends HandledPacFile<MemoryAssetHandle> {
 
     public MemoryPacFile() {
-    }
-
-    public MemoryPacFile(PacFile other) {
-        super(other);
     }
 
     /**
@@ -50,24 +38,6 @@ public class MemoryPacFile extends PacFile {
      */
     public MemoryPacFile(MemoryPacFile other) {
         super(other);
-        handles.clear();
-        deepCopyHandles(other.handles);
-    }
-
-    /**
-     * Performs a deep copy from a Map of handles
-     * @param handles
-     */
-    public MemoryPacFile(Map<TypePurposeUniqueId, MemoryAssetHandle> handles) {
-        super(PacFile.MAJOR_VERSION, PacFile.MINOR_VERSION);
-        this.handles.clear();
-        deepCopyHandles(handles);
-    }
-
-    private void deepCopyHandles(Map<TypePurposeUniqueId, MemoryAssetHandle> other) {
-        for (Map.Entry<TypePurposeUniqueId, MemoryAssetHandle> entry : other.entrySet()) {
-            handles.put(entry.getKey(), new MemoryAssetHandle(entry.getValue()));
-        }
     }
 
     @Override

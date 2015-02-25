@@ -24,12 +24,14 @@
 
 package co.phoenixlab.phoenixpac;
 
-public class MemoryPacBuilder {
+import java.io.IOException;
 
-    private MemoryPacFile pacFile;
+public class HandlePacBuilder {
 
-    private MemoryPacBuilder() {
-        pacFile = new MemoryPacFile();
+    private HandledPacFile<AssetHandle> pacFile;
+
+    private HandlePacBuilder() {
+        pacFile = new HandledPacFile<>();
         pacFile.index = new Index();
         pacFile.metadata = new PacMetadata();
     }
@@ -42,7 +44,7 @@ public class MemoryPacBuilder {
         return new EntryBuilder(this);
     }
 
-    public MemoryPacBuilder addEntry(IndexEntry entry, MemoryAssetHandle assetHandle) {
+    public HandlePacBuilder addEntry(IndexEntry entry, AssetHandle assetHandle) {
         EntryBuilder builder = new EntryBuilder(this);
         builder.entry = entry;
         builder.assetHandle = assetHandle;
@@ -50,7 +52,7 @@ public class MemoryPacBuilder {
         return this;
     }
 
-    public MemoryPacFile finish() {
+    public HandledPacFile<AssetHandle> finish() {
         if (pacFile.header == null) {
             throw new IllegalStateException("Header not constructed");
         }
@@ -59,16 +61,16 @@ public class MemoryPacBuilder {
     }
 
 
-    public static MemoryPacBuilder newBuilder() {
-        return new MemoryPacBuilder();
+    public static HandlePacBuilder newBuilder() {
+        return new HandlePacBuilder();
     }
 
     public class HeaderBuilder {
 
         private PacHeader header;
-        private MemoryPacBuilder builder;
+        private HandlePacBuilder builder;
 
-        HeaderBuilder(MemoryPacBuilder builder) {
+        HeaderBuilder(HandlePacBuilder builder) {
             this.builder = builder;
             header = new PacHeader();
         }
@@ -92,7 +94,7 @@ public class MemoryPacBuilder {
             return this;
         }
 
-        public MemoryPacBuilder finishHeader() {
+        public HandlePacBuilder finishHeader() {
             pacFile.header = header;
             return builder;
         }
@@ -101,10 +103,10 @@ public class MemoryPacBuilder {
 
     public class EntryBuilder {
         private IndexEntry entry;
-        private MemoryAssetHandle assetHandle;
-        private MemoryPacBuilder builder;
+        private AssetHandle assetHandle;
+        private HandlePacBuilder builder;
 
-        EntryBuilder(MemoryPacBuilder builder) {
+        EntryBuilder(HandlePacBuilder builder) {
             this.builder = builder;
             entry = new IndexEntry();
         }
@@ -128,11 +130,11 @@ public class MemoryPacBuilder {
             return this;
         }
 
-        public EntryBuilder withComputedSha256Hash() {
+        public EntryBuilder withComputedSha256Hash() throws IOException {
             if (assetHandle == null) {
                 throw new IllegalStateException("Must call withMemoryAssetHandle() first");
             }
-            entry.sha256Hash = IndexEntry.computeSha256Hash(assetHandle.data);
+            entry.sha256Hash = IndexEntry.computeSha256Hash(assetHandle.getRawBytes());
             return this;
         }
 
@@ -154,7 +156,7 @@ public class MemoryPacBuilder {
             return this;
         }
 
-        public MemoryPacBuilder add() {
+        public HandlePacBuilder add() {
             if (entry.tpuid == null) {
                 throw new IllegalStateException("Must call withTPUID() first");
             }

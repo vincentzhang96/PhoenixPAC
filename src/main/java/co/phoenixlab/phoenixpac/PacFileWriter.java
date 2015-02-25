@@ -48,8 +48,8 @@ public class PacFileWriter implements AutoCloseable {
         this(path.toFile());
     }
 
-    public void writeNew(MemoryPacFile pacFile) throws IOException {
-        MemoryPacFile pac = new MemoryPacFile(pacFile);
+    public void writeNew(HandledPacFile<AssetHandle> pacFile) throws IOException {
+        HandledPacFile<AssetHandle> pac = new HandledPacFile(pacFile);
         randomAccessFile.seek(0);
         randomAccessFile.setLength(0);
         //  The first time we write the header we don't care about the offsets - set them to 0
@@ -93,10 +93,10 @@ public class PacFileWriter implements AutoCloseable {
         }
     }
 
-    private void writeFiles(MemoryPacFile pacFile) throws IOException {
-        for (Map.Entry<TypePurposeUniqueId, MemoryAssetHandle> entry : pacFile.handles.entrySet()) {
+    private void writeFiles(HandledPacFile<AssetHandle> pacFile) throws IOException {
+        for (Map.Entry<TypePurposeUniqueId, AssetHandle> entry : pacFile.getHandles().entrySet()) {
             IndexEntry indx = pacFile.getIndex().getEntry(entry.getKey());
-            MemoryAssetHandle handle = entry.getValue();
+            AssetHandle handle = entry.getValue();
             indx.offset = randomAccessFile.getFilePointer();
             randomAccessFile.write(handle.getRawBytes());
             indx.diskSize = (int)(randomAccessFile.getFilePointer() - indx.offset);
