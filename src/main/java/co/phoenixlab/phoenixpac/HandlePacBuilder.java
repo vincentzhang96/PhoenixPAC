@@ -125,6 +125,16 @@ public class HandlePacBuilder {
             return this;
         }
 
+        public EntryBuilder withDiskSize(int diskSize) {
+            entry.diskSize = diskSize;
+            return this;
+        }
+
+        public EntryBuilder withSize(int size) {
+            entry.diskSize = entry.memorySize = size;
+            return this;
+        }
+
         public EntryBuilder withAssetHandle(AssetHandle assetHandle) {
             this.assetHandle = assetHandle;
             return this;
