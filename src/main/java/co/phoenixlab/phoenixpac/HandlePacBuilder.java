@@ -33,7 +33,6 @@ public class HandlePacBuilder {
     private HandlePacBuilder() {
         pacFile = new HandledPacFile<>();
         pacFile.index = new Index();
-        pacFile.metadata = new PacMetadata();
     }
 
     public HeaderBuilder buildHeader() {
@@ -50,6 +49,10 @@ public class HandlePacBuilder {
         builder.assetHandle = assetHandle;
         builder.add();
         return this;
+    }
+
+    public MetadataBuilder buildMetadata() {
+        return new MetadataBuilder(this);
     }
 
     public HandledPacFile<AssetHandle> finish() {
@@ -181,5 +184,47 @@ public class HandlePacBuilder {
             return builder;
         }
 
+    }
+
+    public class MetadataBuilder {
+        private PacMetadata metadata;
+        private HandlePacBuilder builder;
+
+        public MetadataBuilder(HandlePacBuilder builder) {
+            this.builder = builder;
+            metadata = new PacMetadata();
+        }
+
+        public MetadataBlockBuilder editBlock(TypePurposeUniqueId tpuid) {
+            return new MetadataBlockBuilder(this, tpuid, metadata.getMetadata().get(tpuid));
+        }
+
+        public HandlePacBuilder finish() {
+            builder.pacFile.metadata = metadata;
+            return builder;
+        }
+
+        public class MetadataBlockBuilder {
+            private TypePurposeUniqueId tpuid;
+            private MetadataBlock block;
+            private MetadataBuilder builder;
+
+            public MetadataBlockBuilder(MetadataBuilder builder, TypePurposeUniqueId tpuid, MetadataBlock block) {
+                this.builder = builder;
+                this.tpuid = tpuid;
+                this.block = block == null ? new MetadataBlock() : block;
+            }
+
+            public MetadataBlockBuilder addEntry(String key, String val) {
+                MetadataEntry entry = new MetadataEntry(key, val);
+                block.entries.put(entry.getKey(), entry);
+                return this;
+            }
+
+            public MetadataBuilder add() {
+                builder.metadata.metadata.put(tpuid, block);
+                return builder;
+            }
+        }
     }
 }

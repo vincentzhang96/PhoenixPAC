@@ -23,7 +23,7 @@ public class HandledPacFile<T extends AssetHandle> extends PacFile{
         super(major, minor);
     }
 
-
+    @SuppressWarnings("unchecked")
     private void deepCopyHandles(Map<TypePurposeUniqueId, T> other) {
         for (Map.Entry<TypePurposeUniqueId, T> entry : other.entrySet()) {
             handles.put(entry.getKey(), (T) entry.getValue().copy());
