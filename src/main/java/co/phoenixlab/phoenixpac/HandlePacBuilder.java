@@ -213,6 +213,7 @@ public class HandlePacBuilder {
                 this.builder = builder;
                 this.tpuid = tpuid;
                 this.block = block == null ? new MetadataBlock() : block;
+                this.block.tpuid = tpuid;
             }
 
             public MetadataBlockBuilder addEntry(String key, String val) {
