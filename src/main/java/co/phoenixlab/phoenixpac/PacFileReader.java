@@ -35,21 +35,24 @@ import java.nio.file.Path;
 public class PacFileReader implements AutoCloseable {
 
     private RandomAccessFile randomAccessFile;
+    private Path path;
 
     public PacFileReader(RandomAccessFile randomAccessFile) {
         this.randomAccessFile = randomAccessFile;
     }
 
-    public PacFileReader(File file) throws IOException {
-        randomAccessFile = new RandomAccessFile(file, "r");
+    public PacFileReader(Path path) throws IOException {
+        this.path = path;
+        randomAccessFile = new RandomAccessFile(path.toFile(), "r");
     }
 
-    public PacFileReader(Path path) throws IOException {
-        this(path.toFile());
+    public PacFileReader(File file) throws IOException {
+        this(file.toPath());
     }
+
 
     public PacFile read() throws IOException {
-        PacFile pacFile = new FilesystemPacFile(randomAccessFile);
+        PacFile pacFile = new FilesystemPacFile(path);
         readHeader(pacFile);
         readIndex(pacFile);
         readMetadata(pacFile);

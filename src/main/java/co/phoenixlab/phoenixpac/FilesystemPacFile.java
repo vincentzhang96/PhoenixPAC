@@ -26,14 +26,14 @@ package co.phoenixlab.phoenixpac;
 
 import java.io.FileNotFoundException;
 import java.io.IOException;
-import java.io.RandomAccessFile;
+import java.nio.file.Path;
 
 public class FilesystemPacFile extends PacFile {
 
-    private RandomAccessFile randomAccessFile;
+    private Path path;
 
-    protected FilesystemPacFile(RandomAccessFile randomAccessFile) {
-        this.randomAccessFile = randomAccessFile;
+    protected FilesystemPacFile(Path path) {
+        this.path = path;
     }
 
     @Override
@@ -42,6 +42,6 @@ public class FilesystemPacFile extends PacFile {
         if (entry == null) {
             throw new FileNotFoundException(tpuid.toString());
         }
-        return new FileSystemAssetHandle(entry, randomAccessFile, entry.compressionId);
+        return new FileSystemAssetHandle(entry, path, entry.compressionId);
     }
 }

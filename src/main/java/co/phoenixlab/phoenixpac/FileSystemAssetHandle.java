@@ -30,14 +30,15 @@ import java.io.RandomAccessFile;
 import java.nio.ByteBuffer;
 import java.nio.channels.Channels;
 import java.nio.channels.FileChannel;
+import java.nio.file.Path;
 
 public class FileSystemAssetHandle implements AssetHandle {
 
     private final IndexEntry indexEntry;
-    private final RandomAccessFile file;
+    private final Path file;
     private final int compressionId;
 
-    public FileSystemAssetHandle(IndexEntry indexEntry, RandomAccessFile file, int compressionId) {
+    public FileSystemAssetHandle(IndexEntry indexEntry, Path file, int compressionId) {
         this.indexEntry = indexEntry;
         this.file = file;
         this.compressionId = compressionId;
@@ -49,30 +50,37 @@ public class FileSystemAssetHandle implements AssetHandle {
         this.compressionId = other.compressionId;
     }
 
-
     @Override
     public byte[] getRawBytes() throws IOException {
-        byte[] ret = new byte[indexEntry.diskSize];
-        file.seek(indexEntry.offset);
-        file.readFully(ret);
-        return ret;
+        try (RandomAccessFile raf = new RandomAccessFile(file.toFile(), "r")) {
+            byte[] ret = new byte[indexEntry.diskSize];
+            raf.seek(indexEntry.offset);
+            raf.readFully(ret);
+            return ret;
+        }
     }
 
     @Override
     public ByteBuffer getRawByteBuffer() throws IOException {
-        ByteBuffer ret = ByteBuffer.allocateDirect(indexEntry.diskSize);
-        FileChannel channel = file.getChannel().position(indexEntry.offset);
-        int bytesRead = 0;
-        while (bytesRead < indexEntry.diskSize) {
-            bytesRead += channel.read(ret);
+        try (RandomAccessFile raf = new RandomAccessFile(file.toFile(), "r")) {
+            ByteBuffer ret = ByteBuffer.allocateDirect(indexEntry.diskSize);
+            FileChannel channel = raf.getChannel().position(indexEntry.offset);
+            int bytesRead = 0;
+            while (bytesRead < indexEntry.diskSize) {
+                bytesRead += channel.read(ret);
+            }
+            ret.flip();
+            return ret;
         }
-        ret.flip();
-        return ret;
     }
 
     @Override
     public InputStream getRawStream() throws IOException {
-        FileChannel channel = file.getChannel().position(indexEntry.offset);
+        //  We don't use try with resources because whoever is calling this
+        //  will close the inputstream, which will close the channel, which
+        //  will close the randomaccessfile.
+        RandomAccessFile raf = new RandomAccessFile(file.toFile(), "r");
+        FileChannel channel = raf.getChannel().position(indexEntry.offset);
         InputStream stream = Channels.newInputStream(channel);
         return new FileSystemInputStream(stream, indexEntry.diskSize);
     }
