@@ -23,6 +23,8 @@
  */
 package co.phoenixlab.phoenixpac;
 
+import java.nio.charset.StandardCharsets;
+
 public class MetadataEntry {
 
     protected int keyLength;
@@ -31,6 +33,19 @@ public class MetadataEntry {
     protected String val;
 
     public MetadataEntry() {
+    }
+
+    public MetadataEntry(String key, String val) {
+        this.key = utf8truncate(key, 255);
+        this.val = utf8truncate(val, 255);
+        keyLength = key.getBytes(StandardCharsets.UTF_8).length;
+        valLength = val.getBytes(StandardCharsets.UTF_8).length;
+        if (keyLength > 255) {
+            throw new IllegalStateException("Truncated key string is greater than 255 bytes");
+        }
+        if (valLength > 255) {
+            throw new IllegalStateException("Truncated val string is greater than 255 bytes");
+        }
     }
 
     public MetadataEntry(MetadataEntry other) {
@@ -76,5 +91,34 @@ public class MetadataEntry {
         int result = key.hashCode();
         result = 31 * result + val.hashCode();
         return result;
+    }
+
+    /* https://gist.github.com/lpar/1031951 */
+    private static String utf8truncate(String input, int length) {
+        StringBuilder result = new StringBuilder(length);
+        int resultlen = 0;
+        for (int i = 0; i < input.length(); i++) {
+            char c = input.charAt(i);
+            int charlen = 0;
+            if (c <= 0x7f) {
+                charlen = 1;
+            } else if (c <= 0x7ff) {
+                charlen = 2;
+            } else if (c <= 0xd7ff) {
+                charlen = 3;
+            } else if (c <= 0xdbff) {
+                charlen = 4;
+            } else if (c <= 0xdfff) {
+                charlen = 0;
+            } else if (c <= 0xffff) {
+                charlen = 3;
+            }
+            if (resultlen + charlen > length) {
+                break;
+            }
+            result.append(c);
+            resultlen += charlen;
+        }
+        return result.toString();
     }
 }

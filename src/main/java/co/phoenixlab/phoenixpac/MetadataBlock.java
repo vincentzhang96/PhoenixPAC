@@ -61,6 +61,15 @@ public class MetadataBlock {
         return size;
     }
 
+    public void calculateSize() {
+        int total = 12; //  TPUID + num entries + size
+        for (MetadataEntry entry : entries.values()) {
+            total += entry.getKeyLength() + entry.getValLength();
+        }
+        size = total;
+        numberOfEntries = entries.size();
+    }
+
     public LinkedHashMap<String, MetadataEntry> getEntries() {
         return entries;
     }

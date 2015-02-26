@@ -55,6 +55,16 @@ public class PacMetadata {
         return size;
     }
 
+    public void calculateSize() {
+        int total = 8;  //  Num blocks + guard bytes
+        for (MetadataBlock block : metadata.values()) {
+            block.calculateSize();
+            total += block.getSize();
+        }
+        size = total;
+        numMetadataBlocks = metadata.size();
+    }
+
     public LinkedHashMap<TypePurposeUniqueId, MetadataBlock> getMetadata() {
         return metadata;
     }

@@ -27,6 +27,7 @@ package co.phoenixlab.phoenixpac;
 import java.io.File;
 import java.io.IOException;
 import java.io.RandomAccessFile;
+import java.nio.charset.StandardCharsets;
 import java.nio.file.Path;
 import java.util.Map;
 
@@ -49,7 +50,7 @@ public class PacFileWriter implements AutoCloseable {
     }
 
     public void writeNew(HandledPacFile<AssetHandle> pacFile) throws IOException {
-        HandledPacFile<AssetHandle> pac = new HandledPacFile(pacFile);
+        HandledPacFile<AssetHandle> pac = new HandledPacFile<>(pacFile);
         randomAccessFile.seek(0);
         randomAccessFile.setLength(0);
         //  The first time we write the header we don't care about the offsets - set them to 0
@@ -66,6 +67,7 @@ public class PacFileWriter implements AutoCloseable {
         pac.header.indexSectionOffset = writeIndex(pac.index, wide);
 
         //  Write metadata
+        pac.header.metadataSectionOffset = writeMetadata(pac.getMetadata());
 
         //  No trash
 
@@ -123,8 +125,32 @@ public class PacFileWriter implements AutoCloseable {
         return startPos;
     }
 
+    private long writeMetadata(PacMetadata metadata) throws IOException {
+        if (metadata == null || metadata.metadata.isEmpty()) {
+            return 0;
+        }
+        metadata.calculateSize();
+        long startPos = randomAccessFile.getFilePointer();
+        randomAccessFile.writeInt(metadata.size);
+        randomAccessFile.writeInt(metadata.numMetadataBlocks);
+        for (MetadataBlock block : metadata.metadata.values()) {
+            randomAccessFile.writeInt(block.tpuid.getTypePurposeCombinedId());
+            randomAccessFile.writeInt(block.tpuid.getUniqueId());
+            randomAccessFile.writeShort(block.numberOfEntries);
+            randomAccessFile.writeShort(block.size);
+            for (MetadataEntry entry : block.entries.values()) {
+                randomAccessFile.writeByte(entry.keyLength);
+                randomAccessFile.writeByte(entry.valLength);
+                randomAccessFile.write(entry.key.getBytes(StandardCharsets.UTF_8));
+                randomAccessFile.write(entry.val.getBytes(StandardCharsets.UTF_8));
+            }
+        }
+        randomAccessFile.writeInt(PacMetadata.GUARD_BYTES);
+        return startPos;
+    }
+
     @Override
-    public void close() throws Exception {
+    public void close() throws IOException {
         randomAccessFile.close();
     }
 }
