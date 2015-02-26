@@ -42,7 +42,7 @@ public abstract class PacFile {
     public PacFile(PacFile other) {
         this.header = new PacHeader(other.header);
         this.index = new Index(other.index);
-        if (other.metadata == null) {
+        if (other.metadata != null) {
             this.metadata = new PacMetadata(other.metadata);
         } else {
             this.metadata = new PacMetadata();
