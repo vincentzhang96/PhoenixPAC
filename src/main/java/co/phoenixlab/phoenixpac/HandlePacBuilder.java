@@ -192,7 +192,10 @@ public class HandlePacBuilder {
 
         public MetadataBuilder(HandlePacBuilder builder) {
             this.builder = builder;
-            metadata = new PacMetadata();
+            metadata = builder.pacFile.metadata;
+            if (metadata == null) {
+                metadata = new PacMetadata();
+            }
         }
 
         public MetadataBlockBuilder editBlock(TypePurposeUniqueId tpuid) {
