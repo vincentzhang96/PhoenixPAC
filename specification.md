@@ -5,7 +5,7 @@ PhoenixPAC Specification
 |-----------|---------------|
 | Author(s) | Vincent Zhang |
 | Created   | Sep 23 2014   |
-| Modified  | Nov 10 2014   |
+| Modified  | Mar 23 2015   |
 
 Specification subject to change.
 
@@ -50,7 +50,7 @@ entries should be merged into one entry. As a good practice, sections of the fil
 filled with random/junk data or written over.
 
 Asset files are stored in the PPAC with no extra data compressed or uncompressed as specified by the Index Entry, but
-cannot exceed 2 GB in size on disk.
+cannot exceed 4 GB in size on disk, or 2 GB if the `JAVA_ARRAY_COMPAT` flag is set.
 
 Format
 ----
@@ -87,7 +87,7 @@ Fields that indicate the size of the structure exclude themselves from that valu
 | `4 BYTES`  | integer  | Unique ID |
 | `WIDE`     | integer  | Disk offset |
 | `4 BYTES`  | integer  | Disk size - max 2GB|
-| `4 BYTES`  | integer  | Memory (decompressed) size - max 2GB |
+| `4 BYTES`  | integer  | Memory (decompressed) size |
 | `1 BYTE`   | integer  | Compression type (0 is no compression) |
 | `3 BYTES`  | reserved | Reserved |
 | `32 BYTES` | hash     | SHA-256 hash of the file |
@@ -136,6 +136,7 @@ Appendix
 ----
 
 ## Flags
-| Name             | Value      | Description |
-|------------------|------------|-------------|
-| USE_LONG_OFFSETS | 0x00000001 | Indicates that this PPAC uses signed 64-bit integers to encode offsets. |
+| Name               | Value      | Description |
+|--------------------|------------|-------------|
+| `USE_LONG_OFFSETS` | 0x00000001 | Indicates that this PPAC uses signed 64-bit integers to encode offsets. |
+| `JAVA_ARRAY_COMPAT` | 0x00000002 | Indicates that no subfile in this PPAC exceeds 2 GB and may be stored in a Java array. |
