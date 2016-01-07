@@ -17,8 +17,8 @@ identifier. Collectively this triplet is referred to as a TPU. Within a PPAC eac
 this need not be true - in fact, a PPAC loader/asset mangement system can take advantage of this to allow for
 overwriting of assets based on file load order.
 
-Structure
-----
+##Structure
+
 PPAC files are big-endian.
 
 File offsets can be stored either as 32-bit unsigned integers (max 4 GB offsets) or 64-bit signed integers (max
@@ -53,7 +53,6 @@ Asset files are stored in the PPAC with no extra data compressed or uncompressed
 cannot exceed 4 GB in size on disk, or 2 GB if the `JAVA_ARRAY_COMPAT` flag is set.
 
 ##Format
-----
 
 `WIDE` sizes are 4 bytes, unless the `USE_LONG_OFFSETS` flag is set where `WIDE` is 8 bytes.
 
