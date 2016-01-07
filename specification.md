@@ -52,14 +52,14 @@ filled with random/junk data or written over.
 Asset files are stored in the PPAC with no extra data compressed or uncompressed as specified by the Index Entry, but
 cannot exceed 4 GB in size on disk, or 2 GB if the `JAVA_ARRAY_COMPAT` flag is set.
 
-Format
+##Format
 ----
 
 `WIDE` sizes are 4 bytes, unless the `USE_LONG_OFFSETS` flag is set where `WIDE` is 8 bytes.
 
 Fields that indicate the size of the structure exclude themselves from that value.
 
-####Header
+###Header
 | Size       | Type     | Description |
 |------------|----------|-------------|
 | `4 BYTES`  | literal  | Magic number `0x50504143` 'PPAC' |
@@ -72,7 +72,7 @@ Fields that indicate the size of the structure exclude themselves from that valu
 | `WIDE`     | integer  | Trash Index offset or `0` if no Trash Index |
 
 
-##Index
+###Index
 | Size       | Type     | Description |
 |------------|----------|-------------|
 | `4 BYTES ` | integer  | Number of Index Entries |
@@ -92,7 +92,7 @@ Fields that indicate the size of the structure exclude themselves from that valu
 | `3 BYTES`  | reserved | Reserved |
 | `32 BYTES` | hash     | SHA-256 hash of the file |
 
-##Metadata Section
+###Metadata
 | Size       | Type     | Description |
 |------------|----------|-------------|
 | `4 BYTES`  | integer  | Size of Metadata Section |
@@ -118,7 +118,7 @@ Fields that indicate the size of the structure exclude themselves from that valu
 | `k BYTES`  | string   | Key string |
 | `v BYTES`  | string   | Value string |
 
-##Trash Index
+###Trash Index
 | Size       | Type     | Description |
 |------------|----------|-------------|
 | `4 BYTES`  | integer  | Number of Trash Entries |
@@ -132,10 +132,9 @@ Fields that indicate the size of the structure exclude themselves from that valu
 | `4 BYTES`  | integer  | Trash section length |
 
 
-Appendix
-----
+##Appendix
 
-## Flags
+### Flags
 | Name               | Value      | Description |
 |--------------------|------------|-------------|
 | `USE_LONG_OFFSETS` | 0x00000001 | Indicates that this PPAC uses signed 64-bit integers to encode offsets. |
