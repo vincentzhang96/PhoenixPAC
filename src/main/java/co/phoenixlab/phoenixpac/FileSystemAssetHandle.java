@@ -113,8 +113,26 @@ class FileSystemInputStream extends InputStream {
     }
 
     @Override
+    public int read(byte[] b, int off, int len) throws IOException {
+        if (b == null) {
+            throw new NullPointerException();
+        } else if (off < 0 || len < 0 || len > b.length - off) {
+            throw new IndexOutOfBoundsException();
+        } else if (len == 0) {
+            return 0;
+        }
+        if (count >= size) {
+            return -1;
+        }
+        len = Math.min(len, available());
+        int read = stream.read(b, off, len);
+        count += read;
+        return read;
+    }
+
+    @Override
     public int available() throws IOException {
-        return size - count;
+        return Math.max(0, size - count);
     }
 
     @Override
