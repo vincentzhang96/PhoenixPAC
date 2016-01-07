@@ -3,6 +3,7 @@ package co.phoenixlab.phoenixpac;
 public class PacHeader {
 
     public static final int FLAG_USE_LONG_OFFSETS = 1;
+    public static final int FLAG_JAVA_ARRAY_COMPAT = 1 << 1;
 
     public static final int MAGIC_NUMBER = 0x50504143;
 
