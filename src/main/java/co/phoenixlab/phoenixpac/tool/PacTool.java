@@ -57,6 +57,7 @@ public class PacTool {
         }
         Map<TypePurposeUniqueId, Path> files = new HashMap<>(20);
         Path pacPath = Paths.get("out.pac");
+        Path mappingsParent = mappings.getParent();
         try (BufferedReader reader = Files.newBufferedReader(mappings, StandardCharsets.UTF_8)) {
             Properties properties = new Properties();
             properties.load(reader);
@@ -68,7 +69,8 @@ public class PacTool {
                 } else {
                     try {
                         TypePurposeUniqueId tpuid = TPU.valueOf(key);
-                        Path path = mappings.getParent().resolve(val).normalize().toAbsolutePath();
+                        Path path = mappingsParent.resolve(val).normalize().toAbsolutePath();
+//                        Path path = Paths.get(val);
                         files.put(tpuid, path);
                         System.out.println("Indexed " + path.toString() + " as " + entry.getKey().toString());
                     } catch (Exception e) {
@@ -82,7 +84,7 @@ public class PacTool {
             e.printStackTrace();
             return;
         }
-        pacPath = mappings.getParent().resolve(pacPath).normalize().toAbsolutePath();
+        pacPath = mappingsParent.resolve(pacPath).normalize().toAbsolutePath();
         int written = 0;
         try (PacFileWriter writer = new PacFileWriter(pacPath)) {
             HandlePacBuilder builder = HandlePacBuilder.newBuilder().buildHeader().
@@ -106,7 +108,7 @@ public class PacTool {
                     // @formatter:off
                     builder = builder.buildMetadata().
                             editBlock(key).
-                                addEntry("filename", file.getFileName().toString()).
+                                addEntry("filename", mappingsParent.relativize(file).toString()).
                                 add().
                             finish();
                     // @formatter:on
@@ -200,6 +202,7 @@ public class PacTool {
                     InputStream inputStream = handle.getRawStream();
                     total = entry.getMemorySize();
                     completed = 0;
+                    Files.createDirectories(target.getParent());
                     //  TODO Compression
                     try (BufferedOutputStream outputStream = new BufferedOutputStream(Files.newOutputStream(target))) {
                         while ((read = inputStream.read(buffer)) != -1) {
