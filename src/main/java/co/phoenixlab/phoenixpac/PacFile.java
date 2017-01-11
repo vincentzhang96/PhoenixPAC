@@ -30,6 +30,7 @@ public abstract class PacFile {
 
     public static final int MAJOR_VERSION = 4;
     public static final int MINOR_VERSION = 0;
+    public static final int COMPRESSION_DEFLATE = 1;
 
     protected PacHeader header;
     protected Index index;

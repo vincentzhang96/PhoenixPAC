@@ -27,26 +27,45 @@ package co.phoenixlab.phoenixpac;
 import java.io.File;
 import java.io.IOException;
 import java.io.RandomAccessFile;
+import java.nio.channels.Channels;
+import java.nio.channels.ReadableByteChannel;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Path;
 import java.util.Map;
+import java.util.zip.Deflater;
+import java.util.zip.DeflaterInputStream;
 
 public class PacFileWriter implements AutoCloseable {
 
     private static final byte[] EMPTY_RESERVED = new byte[16];
 
     private RandomAccessFile randomAccessFile;
+    private final boolean compressFiles;
 
     public PacFileWriter(RandomAccessFile randomAccessFile) {
+        this(randomAccessFile, false);
+    }
+
+    public PacFileWriter(RandomAccessFile randomAccessFile, boolean compressFiles) {
         this.randomAccessFile = randomAccessFile;
+        this.compressFiles = compressFiles;
     }
 
     public PacFileWriter(File file) throws IOException {
+        this(file, false);
+    }
+
+    public PacFileWriter(File file, boolean compressFiles) throws IOException {
         randomAccessFile = new RandomAccessFile(file, "rw");
+        this.compressFiles = compressFiles;
     }
 
     public PacFileWriter(Path path) throws IOException {
         this(path.toFile());
+    }
+
+    public PacFileWriter(Path path, boolean compressFiles) throws IOException {
+        this(path.toFile(), compressFiles);
     }
 
     public void writeNew(HandledPacFile<AssetHandle> pacFile) throws IOException {
@@ -100,8 +119,29 @@ public class PacFileWriter implements AutoCloseable {
             IndexEntry indx = pacFile.getIndex().getEntry(entry.getKey());
             AssetHandle handle = entry.getValue();
             indx.offset = randomAccessFile.getFilePointer();
-            randomAccessFile.write(handle.getRawBytes());
-            indx.diskSize = (int)(randomAccessFile.getFilePointer() - indx.offset);
+            indx.compressionId = PacFile.COMPRESSION_DEFLATE;
+            int srcCompId = handle.getCompressionId();
+            if (srcCompId == 0 && compressFiles) {
+                //  Compress the file
+                indx.compressionId = PacFile.COMPRESSION_DEFLATE;
+                DeflaterInputStream srcIn = new DeflaterInputStream(handle.getRawStream(),
+                    new Deflater(Deflater.BEST_COMPRESSION));
+                ReadableByteChannel srcCh = Channels.newChannel(srcIn);
+                long written = 0;
+                long writ;
+                long pos = randomAccessFile.getFilePointer();
+                while ((writ = randomAccessFile.getChannel().transferFrom(srcCh, pos + written, 8192)) != 0) {
+                    written += writ;
+                }
+                int diskSize = (int)(Math.min(written, Integer.MAX_VALUE));
+                randomAccessFile.skipBytes(Math.max((int) written, 0));
+                indx.diskSize = diskSize;
+            } else {
+                //  Carry compression over
+                indx.compressionId = srcCompId;
+                randomAccessFile.write(handle.getRawBytes());
+                indx.diskSize = (int)(randomAccessFile.getFilePointer() - indx.offset);
+            }
         }
     }
 

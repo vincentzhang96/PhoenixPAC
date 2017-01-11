@@ -1,32 +1,6 @@
-/*
- * The MIT License (MIT)
- *
- * Copyright (c) 2014 Vincent Zhang
- *
- * Permission is hereby granted, free of charge, to any person obtaining a copy
- * of this software and associated documentation files (the "Software"), to deal
- * in the Software without restriction, including without limitation the rights
- * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
- * copies of the Software, and to permit persons to whom the Software is
- * furnished to do so, subject to the following conditions:
- *
- * The above copyright notice and this permission notice shall be included in all
- * copies or substantial portions of the Software.
- *
- * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
- * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
- * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
- * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
- * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
- * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
- * SOFTWARE.
- */
-
 package co.phoenixlab.phoenixpac;
 
-import org.junit.Assert;
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.*;
 
 import java.io.ByteArrayOutputStream;
 import java.io.InputStream;
@@ -34,8 +8,10 @@ import java.nio.ByteBuffer;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.util.zip.DataFormatException;
+import java.util.zip.Inflater;
 
-public class ReadTest {
+public class CompressedReadTest {
 
     private Path pacPath;
     private String testString;
@@ -44,31 +20,33 @@ public class ReadTest {
 
     private PacFile pacFile;
     private AssetHandle handle;
+    private Inflater inflater;
 
 
     @Before
     public void setUp() throws Exception {
-        pacPath = Paths.get(".").toAbsolutePath().resolve("test.pac");
+        pacPath = Paths.get(".").toAbsolutePath().resolve("test_comp.pac");
         testString = "ABCDEFGHIJKLMNOPQRSTUVWXYZ1234567890ëèï▲↔ƒ";
         rawData = testString.getBytes(StandardCharsets.UTF_8);
         typePurposeUniqueId =new TypePurposeUniqueId(0xAABB, 0xCCDD, 0xDEADBEEF);
         MemoryAssetHandle assetHandle = new MemoryAssetHandle(rawData);
         HandledPacFile memoryPacFile = HandlePacBuilder.newBuilder().
-                buildHeader().withLatestVersion().setFlag(PacHeader.FLAG_USE_LONG_OFFSETS, true).finishHeader().
-                newEntry().
-                withTPUID(typePurposeUniqueId).
-                withAssetHandle(assetHandle).
-                withMemorySize(rawData.length).
-                withNoCompression().
-                withComputedSha256Hash().
-                add().
-                finish();
-        PacFileWriter writer = new PacFileWriter(pacPath, false);
+            buildHeader().withLatestVersion().setFlag(PacHeader.FLAG_USE_LONG_OFFSETS, true).finishHeader().
+            newEntry().
+            withTPUID(typePurposeUniqueId).
+            withAssetHandle(assetHandle).
+            withMemorySize(rawData.length).
+            withNoCompression().
+            withComputedSha256Hash().
+            add().
+            finish();
+        PacFileWriter writer = new PacFileWriter(pacPath, true);
         writer.writeNew(memoryPacFile);
         writer.close();
         PacFileReader reader = new PacFileReader(pacPath);
         pacFile = reader.read();
         handle = pacFile.getHandle(typePurposeUniqueId);
+        inflater = new Inflater();
     }
 
     @Test
@@ -104,7 +82,7 @@ public class ReadTest {
 
     @Test
     public void handleByteArrayTest() throws Exception {
-        byte[] bytes = handle.getRawBytes();
+        byte[] bytes = inflate(handle.getRawBytes());
         Assert.assertArrayEquals(rawData, bytes);
         assertString(bytes);
     }
@@ -118,7 +96,8 @@ public class ReadTest {
         while ((len = inputStream.read(buf)) != -1) {
             outputStream.write(buf, 0, len);
         }
-        byte[] bytes = outputStream.toByteArray();
+        byte[] bytes = inflate(outputStream.toByteArray());
+
         Assert.assertArrayEquals(rawData, bytes);
         assertString(bytes);
     }
@@ -128,12 +107,24 @@ public class ReadTest {
         ByteBuffer buffer = handle.getRawByteBuffer();
         byte[] bytes = new byte[buffer.limit()];
         buffer.get(bytes);
-        Assert.assertArrayEquals(rawData, bytes);
-        assertString(bytes);
+        byte[] ret = inflate(bytes);
+        Assert.assertArrayEquals(rawData, ret);
+        assertString(ret);
     }
 
     private void assertString(byte[] bytes) throws Exception {
         String string = new String(bytes, StandardCharsets.UTF_8);
         Assert.assertEquals(testString, string);
+    }
+
+    private byte[] inflate(byte[] in) throws DataFormatException {
+        inflater.setInput(in);
+        ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
+        byte[] buf = new byte[8192];
+        int infl;
+        while ((infl = inflater.inflate(buf)) != 0) {
+            outputStream.write(buf, 0, infl);
+        }
+        return outputStream.toByteArray();
     }
 }

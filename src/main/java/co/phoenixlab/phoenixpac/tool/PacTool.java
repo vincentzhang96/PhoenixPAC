@@ -3,11 +3,15 @@ package co.phoenixlab.phoenixpac.tool;
 import co.phoenixlab.phoenixpac.*;
 
 import java.io.*;
+import java.nio.channels.Channels;
+import java.nio.channels.FileChannel;
+import java.nio.channels.ReadableByteChannel;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.*;
+import java.util.zip.InflaterInputStream;
 
 public class PacTool {
 
@@ -203,15 +207,33 @@ public class PacTool {
                     total = entry.getMemorySize();
                     completed = 0;
                     Files.createDirectories(target.getParent());
-                    //  TODO Compression
-                    try (BufferedOutputStream outputStream = new BufferedOutputStream(Files.newOutputStream(target))) {
-                        while ((read = inputStream.read(buffer)) != -1) {
-                            outputStream.write(buffer, 0, read);
-                            completed += read * 100;
-                            System.out.printf("\r>>>> %d%%", (completed / total));
+                    int compId = handle.getCompressionId();
+                    if (compId == 0) {
+                        try (BufferedOutputStream outputStream =
+                                 new BufferedOutputStream(Files.newOutputStream(target))) {
+                            while ((read = inputStream.read(buffer)) != -1) {
+                                outputStream.write(buffer, 0, read);
+                                completed += read * 100;
+                                System.out.printf("\r>>>> %d%%", (completed / total));
+                            }
+                            outputStream.flush();
                         }
-                        outputStream.flush();
+                    } else if (compId == PacFile.COMPRESSION_DEFLATE) {
+                        Files.deleteIfExists(target);
+                        try (RandomAccessFile raf = new RandomAccessFile(target.toFile(), "rw")) {
+                            ReadableByteChannel in = Channels.newChannel(new InflaterInputStream(inputStream));
+                            FileChannel outCh = raf.getChannel();
+                            long written = 0;
+                            long writ;
+                            while ((writ = outCh.transferFrom(in, written, 8192)) != 0) {
+                                written += writ;
+                                System.out.printf("\r>>>> %d%%", (100L * written) / total);
+                            }
+                        }
+                    } else {
+                        throw new UnsupportedOperationException("Unknown compression ID " + compId);
                     }
+
                     System.out.printf("%nUnpacked %s%n", target.toString());
                 } catch (IOException e) {
                     System.err.println("Unable to export asset " + tpuid.toString());
