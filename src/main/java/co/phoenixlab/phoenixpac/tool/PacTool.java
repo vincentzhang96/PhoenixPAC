@@ -18,8 +18,8 @@ public class PacTool {
     public static void main(String[] args) {
         String cmd;
         boolean prompted = false;
+        Scanner scanner = new Scanner(System.in);
         if (args.length == 0) {
-            Scanner scanner = new Scanner(System.in);
             System.out.print("Enter a command: ");
             cmd = scanner.nextLine();
             prompted = true;
@@ -30,13 +30,21 @@ public class PacTool {
         if (!prompted) {
             System.arraycopy(args, 1, cmdArgs, 0, cmdArgs.length);
         }
-        if ("pack".equalsIgnoreCase(cmd)) {
-            pack(cmdArgs);
-        } else if ("list".equalsIgnoreCase(cmd)) {
-            list(cmdArgs);
-        } else if ("unpack".equalsIgnoreCase(cmd)) {
-            unpack(cmdArgs);
-        }
+        do {
+            if ("pack".equalsIgnoreCase(cmd)) {
+                pack(cmdArgs);
+            } else if ("list".equalsIgnoreCase(cmd)) {
+                list(cmdArgs);
+            } else if ("unpack".equalsIgnoreCase(cmd)) {
+                unpack(cmdArgs);
+            } else if ("quit".equalsIgnoreCase(cmd)) {
+                break;
+            }
+            if (prompted) {
+                System.out.print("Enter a command: ");
+                cmd = scanner.nextLine();
+            }
+        } while (prompted);
     }
 
     private static void pack(String[] args) {
@@ -92,7 +100,8 @@ public class PacTool {
         int written = 0;
         try (PacFileWriter writer = new PacFileWriter(pacPath)) {
             HandlePacBuilder builder = HandlePacBuilder.newBuilder().buildHeader().
-                    withLatestVersion().
+                        withLatestVersion().
+                        setFlag(PacHeader.FLAG_USE_LONG_OFFSETS, false).
                     finishHeader();
             //  Packing!
             for (Map.Entry<TypePurposeUniqueId, Path> entry : files.entrySet()) {
