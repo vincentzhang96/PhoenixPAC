@@ -39,6 +39,8 @@ public class PacTool {
                 unpack(cmdArgs);
             } else if ("quit".equalsIgnoreCase(cmd)) {
                 break;
+            } else if ("help".equalsIgnoreCase(cmd)) {
+                System.out.println("list, pack, unpack, quit, help");
             }
             if (prompted) {
                 System.out.print("Enter a command: ");
@@ -98,7 +100,7 @@ public class PacTool {
         }
         pacPath = mappingsParent.resolve(pacPath).normalize().toAbsolutePath();
         int written = 0;
-        try (PacFileWriter writer = new PacFileWriter(pacPath)) {
+        try (PacFileWriter writer = new PacFileWriter(pacPath, true)) {
             HandlePacBuilder builder = HandlePacBuilder.newBuilder().buildHeader().
                         withLatestVersion().
                         setFlag(PacHeader.FLAG_USE_LONG_OFFSETS, false).

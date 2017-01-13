@@ -77,7 +77,7 @@ public class CompressedReadTest {
     @Test
     public void handleTest() throws Exception {
         Assert.assertNotNull(handle);
-        Assert.assertEquals(0, handle.getCompressionId());
+        Assert.assertEquals(PacFile.COMPRESSION_DEFLATE, handle.getCompressionId());
     }
 
     @Test
