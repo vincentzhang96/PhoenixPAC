@@ -29,7 +29,7 @@ import java.util.Map;
 
 public class PacMetadata {
 
-    public static final int GUARD_BYTES = 0xFFEEDDCC;
+    public static final int GUARD_BYTES = 0x4D455441;
     protected int size;
     protected int numMetadataBlocks;
     protected final LinkedHashMap<TypePurposeUniqueId, MetadataBlock> metadata;
