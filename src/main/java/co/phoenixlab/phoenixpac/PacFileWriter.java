@@ -119,7 +119,6 @@ public class PacFileWriter implements AutoCloseable {
             IndexEntry indx = pacFile.getIndex().getEntry(entry.getKey());
             AssetHandle handle = entry.getValue();
             indx.offset = randomAccessFile.getFilePointer();
-            indx.compressionId = PacFile.COMPRESSION_DEFLATE;
             int srcCompId = handle.getCompressionId();
             if (srcCompId == 0 && compressFiles) {
                 //  Compress the file
@@ -158,7 +157,7 @@ public class PacFileWriter implements AutoCloseable {
             }
             randomAccessFile.writeInt(entry.diskSize);
             randomAccessFile.writeInt(entry.memorySize);
-            randomAccessFile.writeInt(0x00FFFFFF & (entry.compressionId << 24));
+            randomAccessFile.writeInt(0xFF000000 & (entry.compressionId << 24));
             randomAccessFile.write(entry.sha256Hash);
         }
         randomAccessFile.writeInt(Index.GUARD_BYTES);
