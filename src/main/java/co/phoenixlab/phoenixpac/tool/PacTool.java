@@ -63,7 +63,7 @@ public class PacTool {
             Scanner scanner = new Scanner(System.in);
             System.out.print("Specify the path to the build file: ");
             String path = scanner.nextLine();
-            mappings = Paths.get(path);
+            mappings = Paths.get(path).toAbsolutePath();
         }
         if (!Files.isRegularFile(mappings)) {
             System.err.println(mappings.normalize().toAbsolutePath().toString() + " does not exist or is not a file");
