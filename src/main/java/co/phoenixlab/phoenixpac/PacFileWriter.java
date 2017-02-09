@@ -26,6 +26,7 @@ package co.phoenixlab.phoenixpac;
 
 import java.io.File;
 import java.io.IOException;
+import java.io.InputStream;
 import java.io.RandomAccessFile;
 import java.nio.channels.Channels;
 import java.nio.channels.ReadableByteChannel;
@@ -123,18 +124,20 @@ public class PacFileWriter implements AutoCloseable {
             if (srcCompId == 0 && compressFiles) {
                 //  Compress the file
                 indx.compressionId = PacFile.COMPRESSION_DEFLATE;
-                DeflaterInputStream srcIn = new DeflaterInputStream(handle.getRawStream(),
-                    new Deflater(Deflater.BEST_COMPRESSION));
-                ReadableByteChannel srcCh = Channels.newChannel(srcIn);
-                long written = 0;
-                long writ;
-                long pos = randomAccessFile.getFilePointer();
-                while ((writ = randomAccessFile.getChannel().transferFrom(srcCh, pos + written, 8192)) != 0) {
-                    written += writ;
+                try (InputStream rawStream = handle.getRawStream()) {
+                    DeflaterInputStream srcIn = new DeflaterInputStream(rawStream,
+                        new Deflater(Deflater.BEST_COMPRESSION));
+                    ReadableByteChannel srcCh = Channels.newChannel(srcIn);
+                    long written = 0;
+                    long writ;
+                    long pos = randomAccessFile.getFilePointer();
+                    while ((writ = randomAccessFile.getChannel().transferFrom(srcCh, pos + written, 8192)) != 0) {
+                        written += writ;
+                    }
+                    int diskSize = (int) (Math.min(written, Integer.MAX_VALUE));
+                    randomAccessFile.skipBytes(Math.max((int) written, 0));
+                    indx.diskSize = diskSize;
                 }
-                int diskSize = (int)(Math.min(written, Integer.MAX_VALUE));
-                randomAccessFile.skipBytes(Math.max((int) written, 0));
-                indx.diskSize = diskSize;
             } else {
                 //  Carry compression over
                 indx.compressionId = srcCompId;
