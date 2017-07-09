@@ -52,7 +52,7 @@ filled with random/junk data or written over.
 Asset files are stored in the PPAC with no extra data compressed or uncompressed as specified by the Index Entry, but
 cannot exceed 4 GB in size on disk, or 2 GB if the `JAVA_ARRAY_COMPAT` flag is set.
 
-##Format
+## Format
 
 `WIDE` sizes are 4 bytes, unless the `USE_LONG_OFFSETS` flag is set where `WIDE` is 8 bytes.
 
