@@ -17,7 +17,7 @@ identifier. Collectively this triplet is referred to as a TPU. Within a PPAC eac
 this need not be true - in fact, a PPAC loader/asset mangement system can take advantage of this to allow for
 overwriting of assets based on file load order.
 
-##Structure
+## Structure
 
 PPAC files are big-endian.
 
@@ -58,7 +58,8 @@ cannot exceed 4 GB in size on disk, or 2 GB if the `JAVA_ARRAY_COMPAT` flag is s
 
 Fields that indicate the size of the structure exclude themselves from that value.
 
-###Header
+### Header
+
 | Size       | Type     | Description |
 |------------|----------|-------------|
 | `4 BYTES`  | literal  | Magic number `0x50504143` 'PPAC' |
@@ -71,14 +72,16 @@ Fields that indicate the size of the structure exclude themselves from that valu
 | `WIDE`     | integer  | Trash Index offset or `0` if no Trash Index |
 
 
-###Index
+### Index
+
 | Size       | Type     | Description |
 |------------|----------|-------------|
 | `4 BYTES ` | integer  | Number of Index Entries |
 |            | set      | Set of Index Entries |
 | `4 BYTES`  | int      | Guard bytes `0x494E4458` |
 
-####Index Entry
+#### Index Entry
+
 | Size       | Type     | Description |
 |------------|----------|-------------|
 | `2 BYTES`  | integer  | Type ID |
@@ -91,7 +94,8 @@ Fields that indicate the size of the structure exclude themselves from that valu
 | `3 BYTES`  | reserved | Reserved |
 | `32 BYTES` | hash     | SHA-256 hash of the file |
 
-###Metadata
+### Metadata
+
 | Size       | Type     | Description |
 |------------|----------|-------------|
 | `4 BYTES`  | integer  | Size of Metadata Section |
@@ -99,7 +103,8 @@ Fields that indicate the size of the structure exclude themselves from that valu
 |            | set      | Set of Metadata Blocks |
 | `4 BYTES`  | int      | Guard bytes `0x4D455441` |
 
-####Metadata Block
+#### Metadata Block
+
 | Size       | Type     | Description |
 |------------|----------|-------------|
 | `2 BYTES`  | integer  | Type ID |
@@ -109,7 +114,8 @@ Fields that indicate the size of the structure exclude themselves from that valu
 | `2 BYTES`  | integer  | Size of Metadata Entries |
 |            | set      | Set of Metadata Entries |
 
-####Metadata Entry
+#### Metadata Entry
+
 | Size       | Type     | Description |
 |------------|----------|-------------|
 | `1 BYTE`   | integer  | Length of key string in bytes |
@@ -117,23 +123,26 @@ Fields that indicate the size of the structure exclude themselves from that valu
 | `k BYTES`  | string   | Key string |
 | `v BYTES`  | string   | Value string |
 
-###Trash Index
+### Trash Index
+
 | Size       | Type     | Description |
 |------------|----------|-------------|
 | `4 BYTES`  | integer  | Number of Trash Entries |
 |            | set      | Set of Trash Entries |
 | `4 BYTES`  | integer  | Guard bytes `0x54525348` |
 
-####Trash Index Entry
+#### Trash Index Entry
+
 | Size       | Type     | Description |
 |------------|----------|-------------|
 | `WIDE`     | integer  | Trash section start offset |
 | `4 BYTES`  | integer  | Trash section length |
 
 
-##Appendix
+## Appendix
 
 ### Flags
+
 | Name               | Value      | Description |
 |--------------------|------------|-------------|
 | `USE_LONG_OFFSETS` | 0x00000001 | Indicates that this PPAC uses signed 64-bit integers to encode offsets. |
